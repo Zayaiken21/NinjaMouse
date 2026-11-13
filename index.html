@@ -112,7 +112,7 @@ const sfx={jump:()=>tone(300,.13,'triangle',.06,280),air:()=>tone(480,.12,'trian
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(_){}};
 
 /* ---------- world ---------- */
-let map=MAPS[0],mapIdx=0,rng=Math.random,solids=[],trees=[],shards=[],genX=0,lastTop=500,idc=0,homeX=0,genDone=false;
+let map=MAPS[0],mapIdx=0,rng=Math.random,solids=[],trees=[],shards=[],anchors=[],genX=0,lastTop=500,idc=0,homeX=0,genDone=false;
 function addChunk(x,y,w,type,extra){const s={id:idc++,x,y,w,h:1300,type,r:[0,1,2,3,4,5,6,7].map(()=>rng())};if(extra)Object.assign(s,extra);solids.push(s);return s}
 function genUntil(lim){
   while(genX<lim&&!genDone){
@@ -122,8 +122,10 @@ function genUntil(lim){
     const top=clamp(lastTop+(rng()*2-1)*M.dy,M.top[0],M.top[1]),gx=genX+gap;
     const hi=Math.min(lastTop,top);
     if(gap>150&&rng()<.88){const aw=clamp(gap*.55,90,190);addChunk(genX+gap*.2,clamp(hi-lerp(170,235,rng()),40,400),aw,'arch',{h:30})}
+    {const na=gap>170?2:1;for(let i=0;i<na;i++){const ax=genX+gap*(i+1)/(na+1)+(rng()-.5)*50;anchors.push({x:ax,y:clamp(hi-lerp(240,340,rng()),-140,330),k:rng()<.55?'cloud':'lantern',p:rng()*6})}}
     if(gap>110){const n=2+(rng()*3|0);for(let i=0;i<n;i++){const t=(i+1)/(n+1);shards.push({x:genX+gap*t,y:hi-70-Math.sin(t*Math.PI)*60-rng()*30,got:false,p:rng()*6})}}
     const s=addChunk(gx,top,w,M.ground);
+    if(w>190&&rng()<.6)anchors.push({x:gx+w*(.3+rng()*.4),y:clamp(top-lerp(270,360,rng()),-140,300),k:rng()<.5?'cloud':'lantern',p:rng()*6});
     if(w>150&&rng()<M.fall)s.fall={side:rng()<.6?1:-1,w:14+rng()*12,flow:rng()};
     if(rng()<M.tree){const n=Math.max(1,Math.floor(w/110*rng()+.5));for(let i=0;i<n;i++)trees.push({x:gx+24+rng()*(w-48),y:top,h:lerp(90,210,rng()),k:rng()})}
     lastTop=top;genX=gx+w;
@@ -206,7 +208,7 @@ const RANGE=600;
 
 function startMap(i,seed){
   mapIdx=((i%MAPS.length)+MAPS.length)%MAPS.length;map=MAPS[mapIdx];
-  curSeed=seed==null?(Math.random()*1e9)|0:seed;rng=mulberry(curSeed);solids=[];trees=[];shards=[];genX=0;lastTop=480;idc=0;genDone=false;homeX=0;
+  curSeed=seed==null?(Math.random()*1e9)|0:seed;rng=mulberry(curSeed);solids=[];trees=[];shards=[];anchors=[];genX=0;lastTop=480;idc=0;genDone=false;homeX=0;
   addChunk(-300,480,820,map.ground);genX=520;lastTop=480;genUntil(2600);
   Object.assign(P,{x:140,y:480,vx:0,vy:0,face:1,ground:true,coyote:0,jumps:2,dashes:1,dashT:0,dashCd:0,gliding:false,hook:null,wall:0,inv:1,safe:{x:140,y:480},trail:[],land:0});
   Object.assign(cat,{x:-300,y:480,speed:map.cat,t:0,roarT:3});
@@ -217,9 +219,14 @@ function burst(x,y,n,col,sp,life,g){for(let i=0;i<n;i++){const a=Math.random()*6
 
 /* grapple targeting: ray first, then aim assist toward nearby ledges */
 function inSolid(x,y){for(const s of solids){if(x>=s.x&&x<=s.x+s.w&&y>=s.y&&y<=s.y+s.h)return true}return false}
+const apos=a=>a.k==='lantern'?[a.x+Math.sin(time*.7+a.p)*6,a.y+Math.sin(time*1.3+a.p)*9]:[a.x+Math.sin(time*.4+a.p)*10,a.y+Math.sin(time*.9+a.p)*4];
 function findAnchor(ox,oy,dx,dy){
-  for(let d=20;d<=RANGE;d+=6){const x=ox+dx*d,y=oy+dy*d;if(inSolid(x,y))return{x,y}}
+  const near=[];for(const a of anchors){const[ax,ay]=apos(a);const d=Math.hypot(ax-ox,ay-oy);if(d<=RANGE+20&&d>40)near.push([a,ax,ay])}
+  for(let d=20;d<=RANGE;d+=6){const x=ox+dx*d,y=oy+dy*d;
+    for(const[a,ax,ay]of near)if(Math.hypot(x-ax,y-ay)<30)return{x:ax,y:ay,ref:a};
+    if(inSolid(x,y))return{x,y}}
   const a0=Math.atan2(dy,dx);let best=null,bs=9;
+  for(const[a,ax,ay]of near){let da=Math.abs(Math.atan2(ay-oy,ax-ox)-a0);if(da>Math.PI)da=6.283-da;if(da>.55)continue;const sc=da-.08+Math.hypot(ax-ox,ay-oy)*.0004;if(sc<bs){bs=sc;best={x:ax,y:ay,ref:a}}}
   for(const s of solids){
     const c=s.type==='arch'?[[s.x+s.w*.5,s.y+s.h],[s.x+4,s.y],[s.x+s.w-4,s.y]]:[[s.x+3,s.y+2],[s.x+s.w-3,s.y+2],[s.x+s.w*.5,s.y+2]];
     for(const[cx,cy]of c){const d=Math.hypot(cx-ox,cy-oy);if(d>RANGE||d<50)continue;let da=Math.abs(Math.atan2(cy-oy,cx-ox)-a0);if(da>Math.PI)da=6.283-da;if(da>.5)continue;const sc=da+d*.0004;if(sc<bs){bs=sc;best={x:cx,y:cy}}}
@@ -230,7 +237,7 @@ onHook=(sx,sy)=>{
   const wx=sx/S+cam.x,wy=sy/S+cam.y,ox=P.x,oy=P.y-30;let dx=wx-ox,dy=wy-oy;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
   const a=findAnchor(ox,oy,dx,dy);hintT=0;
   if(!a){P.hook={mode:'miss',x:ox,y:oy,tx:ox+dx*260,ty:oy+dy*260,t:.18,rel:false};sfx.hook();return}
-  P.hook={mode:'fly',x:ox,y:oy,tx:a.x,ty:a.y,rel:false,minT:0,len:0};sfx.hook();
+  P.hook={mode:'fly',x:ox,y:oy,tx:a.x,ty:a.y,ref:a.ref||null,rel:false,minT:0,len:0};sfx.hook();
 };
 onRelease=()=>{const h=P.hook;if(!h)return;if(h.mode==='fly'){h.rel=true;return}if(h.mode==='on'){if(time<h.minT)h.rel=true;else dropHook(true)}};
 function dropHook(boost){const h=P.hook;P.hook=null;if(h&&h.mode==='on'){P.jumps=Math.max(P.jumps,1);if(boost){P.vx*=1.1;if(P.vy<0)P.vy*=1.12}burst(h.tx,h.ty,5,'#ffd7a8',120,.4,200)}}
@@ -239,7 +246,7 @@ function updateHook(dt,ax,ay){
   const h=P.hook;if(!h)return;const hx=P.x,hy=P.y-30;
   if(h.mode==='miss'){h.t-=dt;h.x=hx;h.y=hy;if(h.t<=0)P.hook=null;return}
   if(h.mode==='fly'){
-    h.x=hx;h.y=hy;
+    h.x=hx;h.y=hy;if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
     const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=3000*dt;
     if(dd<=st){h.mode='on';h.len=clamp(Math.hypot(h.tx-hx,h.ty-hy),70,RANGE);h.minT=time+.32;P.dashes=1;P.ground=false;sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
@@ -247,6 +254,7 @@ function updateHook(dt,ax,ay){
     return;
   }
   if(h.rel&&time>=h.minT){dropHook(true);return}
+  if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
   if(ay<-.4)h.len=Math.max(70,h.len-300*dt);else if(ay>.4)h.len=Math.min(RANGE,h.len+240*dt);
   if(ax)P.vx+=ax*820*dt;
   P.vy+=60*dt;
@@ -353,7 +361,7 @@ function update(dt){
   /* world */
   genUntil(p.x+2600);
   if(genDone&&!winX&&homeX)winX=homeX;
-  if(solids.length>40){const lim=Math.min(p.x,cat.x)-2200;solids=solids.filter(s=>s.x+s.w>lim);trees=trees.filter(t=>t.x>lim);shards=shards.filter(s=>s.x>lim)}
+  if(solids.length>40){const lim=Math.min(p.x,cat.x)-2200;solids=solids.filter(s=>s.x+s.w>lim);trees=trees.filter(t=>t.x>lim);shards=shards.filter(s=>s.x>lim);anchors=anchors.filter(a=>a.x>lim)}
   for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.g*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);if(parts.length>400)parts.splice(0,parts.length-400);
   shake=Math.max(0,shake-dt);
   /* camera */
@@ -457,6 +465,24 @@ function drawHome(s,t){
   ctx.fillStyle='#ff8a5c';ctx.beginPath();ctx.moveTo(hx+56,y-90);ctx.lineTo(hx+56+30+Math.sin(t*5)*3,y-80);ctx.lineTo(hx+56,y-68);ctx.fill();
   ctx.fillStyle='#fff';ctx.font='700 15px "Chakra Petch",system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('SAFE HOLE',hx,y-80);
 }
+function drawAnchor(a,t){
+  const[x,y]=apos(a),reach=Math.hypot(x-P.x,y-(P.y-30))<=RANGE&&state!=='menu';
+  if(a.k==='cloud'){
+    const cx=x,cy=y-34;ctx.fillStyle=map.moon?'rgba(205,215,255,.9)':'rgba(255,255,255,.95)';
+    for(const[ox,oy,r]of[[-26,6,16],[-10,-4,20],[10,-8,22],[28,4,16],[0,8,18]]){ctx.beginPath();ctx.arc(cx+ox,cy+oy,r,0,6.283);ctx.fill()}
+    ctx.fillStyle=map.moon?'rgba(120,130,200,.35)':'rgba(170,190,230,.45)';ctx.beginPath();ctx.ellipse(cx,cy+18,38,6,0,0,6.283);ctx.fill();
+    ctx.strokeStyle='#c9a560';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy+20);ctx.lineTo(x,y-8);ctx.stroke();
+  }else{
+    const bx=x,by=y-40;const g=ctx.createRadialGradient(bx,by,2,bx,by,26);g.addColorStop(0,'#fff3c4');g.addColorStop(.5,'#ffb35c');g.addColorStop(1,'#e8603c');
+    ctx.fillStyle='rgba(255,180,90,'+(.18+.08*Math.sin(t*3+a.p))+')';ctx.beginPath();ctx.arc(bx,by,36,0,6.283);ctx.fill();
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(bx,by,17,21,0,0,6.283);ctx.fill();
+    ctx.strokeStyle='rgba(120,40,20,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(bx,by,7,21,0,0,6.283);ctx.stroke();
+    ctx.fillStyle='#6b3a24';ctx.fillRect(bx-6,by+20,12,5);
+    ctx.strokeStyle='#c9a560';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by+25);ctx.lineTo(x,y-8);ctx.stroke();
+  }
+  if(reach){ctx.fillStyle='rgba(255,213,138,'+(.22+.12*Math.sin(t*4+a.p))+')';ctx.beginPath();ctx.arc(x,y,16,0,6.283);ctx.fill()}
+  ctx.strokeStyle=reach?'#ffe2a8':'#d4b06a';ctx.lineWidth=3.5;ctx.beginPath();ctx.arc(x,y,8,0,6.283);ctx.stroke();
+}
 function drawTree(tr,t){
   const sw=Math.sin(t*1.2+tr.k*9)*3,h=tr.h,x=tr.x,y=tr.y;
   ctx.fillStyle='#4a3428';ctx.fillRect(x-3,y-h*.25,6,h*.25+2);
@@ -553,6 +579,7 @@ function draw(){
   for(const s of solids)if(s.type!=='arch'&&s.x+s.w>vx0-40&&s.x<vx1+40)drawSolid(s,t);
   for(const tr of trees)if(tr.x>vx0-60&&tr.x<vx1+60)drawTree(tr,t);
   for(const s of solids)if(s.type==='arch'&&s.x+s.w>vx0&&s.x<vx1)drawSolid(s,t);
+  for(const a of anchors)if(a.x>vx0-60&&a.x<vx1+60)drawAnchor(a,t);
   for(const c of shards)if(c.x>vx0&&c.x<vx1)drawCheese(c,t);
   drawRiver(t,vx0,vx1);
   /* grapple rope */
@@ -603,7 +630,7 @@ function drawHUD(t){
   if(countdown>0){ctx.font=`italic 700 ${Math.round(H*.22)}px ${F}`;ctx.fillStyle='#fff';ctx.fillText(Math.ceil(countdown),W/2,H*.55)}
   else if(levelT<.8&&NET.active){ctx.font=`italic 700 ${Math.round(H*.18)}px ${F}`;ctx.fillStyle='#ffd58a';ctx.fillText('RUN!',W/2,H*.55)}
   if(hintT>0){ctx.globalAlpha=Math.min(1,hintT);ctx.font=`500 ${Math.round(clamp(H*.042,12,16))}px Sora,system-ui,sans-serif`;ctx.fillStyle='#fff';
-    ctx.fillText(coarse?'Tap the sky or a rock to grapple · hold JUMP to glide':'Click to grapple · Space jump (twice to double jump, hold to glide) · Shift dash',W/2,H*.3);ctx.globalAlpha=1}
+    ctx.fillText(coarse?'Tap a cloud ring, lantern or rock to grapple · hold JUMP to glide':'Click to grapple · Space jump (twice to double jump, hold to glide) · Shift dash',W/2,H*.3);ctx.globalAlpha=1}
   if(!coarse)return;
   /* touch controls */
   if(stick.on){const R=clamp(H*.16,40,64);ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(stick.ox,stick.oy,R,0,6.283);ctx.stroke();

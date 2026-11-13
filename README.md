@@ -11,7 +11,7 @@ Hold your phone sideways to play.
 - **Riverstone Gorge:** mossy boulders, white-water rivers and waterfalls
 - **Glacier Pass:** icy peaks under the aurora, frozen falls and falling snow
 
-Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges with gold grapple rings, and cheese to collect. Reach the safe hole at the end before the cat catches you.
+Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
 
 ## Controls
 | Phone | Keyboard | Action |
