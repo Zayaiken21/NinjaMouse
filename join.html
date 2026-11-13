@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Join my run · Ninja Mouse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tap to join my Ninja Mouse run. Escape the cat with friends, free in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ninja Mouse">
+<meta property="og:title" content="Join my run on Ninja Mouse">
+<meta property="og:description" content="Tap to jump in. Grapple, glide and outrun the cat together.">
+<meta property="og:url" content="https://zayaiken21.github.io/NinjaMouse/join.html">
+<meta name="theme-color" content="#140c2e">
+<style>
+  html, body { margin: 0; height: 100%; background: #140c2e; color: #f4f1ff; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: grid; place-items: center; text-align: center; padding: 16px; box-sizing: border-box; }
+  h1 { margin: 0; font-style: italic; font-size: 44px; }
+  h1 span { color: #ff8a5c; }
+  a { display: inline-block; margin-top: 18px; background: #ff8a5c; color: #2a0f2e; font-weight: 800; text-decoration: none; padding: 12px 26px; border-radius: 999px; font-size: 18px; }
+  p { color: #b9b0e0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ninja <span>Mouse</span></h1>
+  <p id="msg">Taking you to the run…</p>
+  <a id="go" href="./">Join the run</a>
+</main>
+<script>
+  // Invite links look like join.html?r=K7Q2M&b=0 so chat apps show a "Join my run" preview; the game itself reads #join-K7Q2M-0.
+  var r = (new URLSearchParams(location.search).get('r') || location.hash.replace(/^#(join-)?/, '')).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  var b = (new URLSearchParams(location.search).get('b') || '').replace(/\D/g, '').slice(0, 1);
+  var target = './' + (r ? '#join-' + r + (b ? '-' + b : '') : '');
+  document.getElementById('go').href = target;
+  if (!r) document.getElementById('msg').textContent = 'This invite is missing its room code. Open the game and pick the run from the list.';
+  location.replace(target);
+</script>
+</body>
+</html>
