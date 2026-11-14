@@ -18,6 +18,14 @@ When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`)
 
 Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
 
+## Obstacles
+- **Thorn bushes** on the rocks: jump them
+- **Fallen logs** at head height: roll under or jump over
+- **Rolling boulders** that tumble along the rocks and off the edge
+- **Hawks** patrolling the sky between rocks, right where you fly
+
+Getting hit knocks you back and drops your grapple, so the cat gains on you. Dashing passes straight through everything. Obstacles get more common the further you run.
+
 ## Controls
 | Phone | Keyboard | Action |
 |---|---|---|
@@ -26,7 +34,8 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 | Hold JUMP while falling | Hold Space | Glide |
 | Tap a cloud ring, lantern or rock (right side) | Click | Grapple. Hold and the rope pulls you up to it, then launches you into the sky. Let go anytime to fly free |
 | Hold left thumb down while hooked | Hold ↓ | Swing on the rope instead of being pulled |
-| DASH | Shift / J / K | Dash, aimed with your left thumb or the arrow keys |
+| DASH | Shift / J / K | Dash, aimed with your left thumb or the arrow keys. You pass through hazards while dashing |
+| ROLL, or flick your left thumb down | C / Ctrl / ↓ | Roll. Keeps your speed and ducks under fallen logs and low hawks. Press it in the air to roll the moment you land |
 | ⏸ | P / Esc | Pause |
 
 Every finger is tracked on its own, so you can hold the stick, tap JUMP twice and fire the grapple at the same moment. Presses are buffered for a moment, so a quick tap just before landing still counts.
