@@ -240,7 +240,7 @@ onHook=(sx,sy)=>{
   P.hook={mode:'fly',x:ox,y:oy,tx:a.x,ty:a.y,ref:a.ref||null,rel:false,minT:0,len:0};sfx.hook();
 };
 onRelease=()=>{const h=P.hook;if(!h)return;if(h.mode==='fly'){h.rel=true;return}if(h.mode==='on'){if(time<h.minT)h.rel=true;else dropHook(true)}};
-function dropHook(boost){const h=P.hook;P.hook=null;if(h&&h.mode==='on'){P.jumps=Math.max(P.jumps,1);if(boost){P.vx*=1.1;if(P.vy<0)P.vy*=1.12}burst(h.tx,h.ty,5,'#ffd7a8',120,.4,200)}}
+function dropHook(boost){const h=P.hook;P.hook=null;if(h&&h.mode==='on'){P.jumps=Math.max(P.jumps,1);P.cut=false;if(boost){P.vx*=1.08;P.vy=P.vy<0?P.vy*1.08-70:P.vy*.85-40}burst(h.tx,h.ty,5,'#ffd7a8',120,.4,200)}}
 
 function updateHook(dt,ax,ay){
   const h=P.hook;if(!h)return;const hx=P.x,hy=P.y-30;
@@ -248,19 +248,28 @@ function updateHook(dt,ax,ay){
   if(h.mode==='fly'){
     h.x=hx;h.y=hy;if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
-    const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=3000*dt;
+    const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=4400*dt;
     if(dd<=st){h.mode='on';h.len=clamp(Math.hypot(h.tx-hx,h.ty-hy),70,RANGE);h.minT=time+.32;P.dashes=1;P.ground=false;sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
     else{h.tipx+=dx/dd*st;h.tipy+=dy/dd*st}
     return;
   }
   if(h.rel&&time>=h.minT){dropHook(true);return}
   if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
-  if(ay<-.4)h.len=Math.max(70,h.len-300*dt);else if(ay>.4)h.len=Math.min(RANGE,h.len+240*dt);
-  if(ax)P.vx+=ax*820*dt;
-  P.vy+=60*dt;
-  const dx=hx-h.tx,dy=hy-h.ty,d=Math.hypot(dx,dy)||1;
-  if(d>h.len){const nx=dx/d,ny=dy/d;P.x-=nx*(d-h.len);P.y-=ny*(d-h.len);const vr=P.vx*nx+P.vy*ny;if(vr>0){P.vx-=vr*nx;P.vy-=vr*ny}}
-  P.vx*=1-.18*dt;
+  if(ay<-.4)h.len=Math.max(70,h.len-320*dt);else if(ay>.4)h.len=Math.min(RANGE,h.len+240*dt);
+  else if(h.len>210&&!P.ground)h.len=Math.max(210,h.len-80*dt);   // long ropes ease in so the swing arcs instead of dragging
+  P.vy+=1500*dt;
+  const dx=hx-h.tx,dy=hy-h.ty,d=Math.hypot(dx,dy)||1,tx=dy/d,ty=-dx/d;   // tangent of the swing, pointing forward (right)
+  if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
+  P.vx*=1-.04*dt;P.vy*=1-.04*dt;
+  const sp=Math.hypot(P.vx,P.vy);if(sp>1150){P.vx*=1150/sp;P.vy*=1150/sp}
+}
+/* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
+function ropeConstrain(){
+  const h=P.hook;if(!h||h.mode!=='on')return;const dx=P.x-h.tx,dy=P.y-30-h.ty,d=Math.hypot(dx,dy)||1;
+  if(d<=h.len)return;const nx=dx/d,ny=dy/d,ex=d-h.len;P.x-=nx*ex;P.y-=ny*ex;
+  const vr=P.vx*nx+P.vy*ny;if(vr<=0)return;
+  const sp=Math.hypot(P.vx,P.vy);P.vx-=vr*nx;P.vy-=vr*ny;const ts=Math.hypot(P.vx,P.vy);
+  if(ts>1){const keep=Math.min(sp*.99,ts+vr*.55);P.vx*=keep/ts;P.vy*=keep/ts}
 }
 
 function resolveX(dt){
@@ -304,10 +313,10 @@ function update(dt){
 
   /* jump: ground, double jump, wall jump, off the rope */
   if(inp.jumpBuf>0){
-    if(p.hook&&p.hook.mode==='on'){const h=p.hook;P.hook=null;p.jumps=Math.max(p.jumps,1);p.vy=Math.min(p.vy,0)-300;p.vx*=1.05;inp.jumpBuf=0;sfx.air();burst(p.x,p.y-20,6,'#ffffff',120,.35,100)}
-    else if(p.ground||p.coyote>0){p.vy=-640;p.ground=false;p.coyote=0;p.jumps=1;inp.jumpBuf=0;sfx.jump();burst(p.x,p.y,6,'#e8dccb',100,.35,300)}
-    else if(p.wall!==0){p.vx=-p.wall*360;p.vy=-610;p.face=-p.wall;p.jumps=Math.max(p.jumps,1);inp.jumpBuf=0;sfx.jump();burst(p.x+p.wall*8,p.y-20,6,'#ffffff',100,.3,300)}
-    else if(p.jumps>0){p.vy=-590;p.jumps--;inp.jumpBuf=0;sfx.air();for(let i=0;i<10;i++)parts.push({x:p.x,y:p.y-4,vx:Math.cos(i*.628)*130,vy:Math.sin(i*.628)*50,l:.35,m:.35,c:'#bfefff',g:0,r:2.4})}
+    if(p.hook&&p.hook.mode==='on'){const h=p.hook;P.hook=null;p.jumps=Math.max(p.jumps,1);p.vy=Math.min(p.vy,0)-300;p.vx*=1.05;p.cut=false;inp.jumpBuf=0;sfx.air();burst(p.x,p.y-20,6,'#ffffff',120,.35,100)}
+    else if(p.ground||p.coyote>0){p.vy=-640;p.cut=true;p.ground=false;p.coyote=0;p.jumps=1;inp.jumpBuf=0;sfx.jump();burst(p.x,p.y,6,'#e8dccb',100,.35,300)}
+    else if(p.wall!==0){p.vx=-p.wall*360;p.vy=-610;p.cut=true;p.face=-p.wall;p.jumps=Math.max(p.jumps,1);inp.jumpBuf=0;sfx.jump();burst(p.x+p.wall*8,p.y-20,6,'#ffffff',100,.3,300)}
+    else if(p.jumps>0){p.vy=-590;p.cut=true;p.jumps--;inp.jumpBuf=0;sfx.air();for(let i=0;i<10;i++)parts.push({x:p.x,y:p.y-4,vx:Math.cos(i*.628)*130,vy:Math.sin(i*.628)*50,l:.35,m:.35,c:'#bfefff',g:0,r:2.4})}
   }
   /* dash */
   if(inp.dashBuf>0&&p.dashCd<=0&&p.dashes>0){
@@ -327,18 +336,19 @@ function update(dt){
     if(!hooked){
       if(p.gliding){
         p.vy=lerp(p.vy,64,1-Math.exp(-7*dt));
-        const tv=ax>.2?400:ax<-.2?-190:p.face*250;p.vx=lerp(p.vx,tv,1-Math.exp(-2.6*dt));
+        const tv=ax>.2?Math.max(400,p.vx*.995):ax<-.2?Math.min(-190,p.vx*.995):(Math.abs(p.vx)>250?p.vx*.995:p.face*250);p.vx=lerp(p.vx,tv,1-Math.exp(-2.6*dt));
         if(Math.random()<.5)parts.push({x:p.x-p.face*12,y:p.y-34,vx:-p.face*40,vy:10,l:.5,m:.5,c:'#ffffffaa',g:0,r:2})
       }else{
-        const g=(p.vy<0&&!jh)?2700:1500;p.vy=Math.min(p.vy+g*dt,1100);
-        const tv=ax*310,ac=p.ground?(ax?2600:2800):(ax?1200:60);
+        if(p.vy>=0)p.cut=false;const g=(p.vy<0&&!jh&&p.cut)?2700:1500;p.vy=Math.min(p.vy+g*dt,1100);
+        const tv=ax*310;let ac=p.ground?(ax?2600:2800):(ax?1200:60);
+        if(!p.ground&&ax&&Math.sign(p.vx)===Math.sign(tv)&&Math.abs(p.vx)>Math.abs(tv))ac=120;
         if(p.vx<tv)p.vx=Math.min(tv,p.vx+ac*dt);else if(p.vx>tv)p.vx=Math.max(tv,p.vx-ac*dt);
         if(!p.ground&&!ax)p.vx*=1-.2*dt;
       }
       if(p.wall!==0&&!p.ground&&p.vy>140)p.vy=140;
     }
   }
-  resolveX(dt);resolveY(dt);
+  resolveX(dt);resolveY(dt);ropeConstrain();
   if(p.hook&&p.hook.mode==='on'&&p.ground&&p.vy>=0){/* rope hanging while standing: fine */}
   p.anim+=dt*(p.ground?Math.abs(p.vx)/42:3);
   for(const t of p.trail)t.a-=dt*2.4;p.trail=p.trail.filter(t=>t.a>0);
@@ -365,8 +375,9 @@ function update(dt){
   for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.g*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);if(parts.length>400)parts.splice(0,parts.length-400);
   shake=Math.max(0,shake-dt);
   /* camera */
-  const vw=W/S,tx=p.x-vw*.32+p.vx*.25,ty=clamp(p.y-300,-260,WATER_Y-440);
-  cam.x=lerp(cam.x,tx,1-Math.exp(-6*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-3.5*dt));
+  const vw=W/S;cam.look=lerp(cam.look||0,clamp(p.vx*.32,-140,280),1-Math.exp(-2.2*dt));
+  const tx=p.x-vw*.32+cam.look,ty=clamp(p.y-300,-260,WATER_Y-440);
+  cam.x=lerp(cam.x,tx,1-Math.exp(-5*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-(p.hook?4.5:3.5)*dt));
 }
 
 /* ---------- drawing ---------- */
