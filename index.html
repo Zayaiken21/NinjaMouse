@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#140c2e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Ninja Mouse">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta property="og:title" content="Ninja Mouse">
 <meta property="og:description" content="Grapple, double jump, dash and glide across mountains and waterfalls before the cat catches you. Play with friends online.">
 <title>Ninja Mouse</title>
@@ -801,7 +806,10 @@ const idxOf=id=>Math.max(0,NET.players.findIndex(p=>p.id===id));
 const colorOf=id=>GHOST_COLS[idxOf(id)%8];
 const nameOf=id=>{const p=NET.players.find(p=>p.id===id);return p?p.name:'Mouse'};
 
+const OFFLINE_NOW="You're offline right now. Solo runs work anywhere; multiplayer needs a connection.";
+const isOff=()=>navigator.onLine===false;
 function mpAction(a,b){
+  if(isOff()&&['host','quick','join','join-code'].includes(a)){mpStatus(OFFLINE_NOW,true);return}
   if(a==='mp'){showMp(NET.active?'lobby':(myName.length>=2?'choose':'name'));return}
   if(a==='mp-back'){stopBrowse();showMenu();return}
   if(a==='rename'){showMp('name');return}
@@ -902,6 +910,7 @@ async function joinRoom(code,relayHint){
 const BROWSE={cs:[],on:false,starting:false,timer:0,rooms:new Map()};
 async function startBrowse(){
   if(BROWSE.on||BROWSE.starting||NET.active)return;
+  if(isOff()){const sc=$('roomScan');if(sc)sc.textContent='· offline';const el=$('roomList');if(el)el.innerHTML='<p class="empty">'+OFFLINE_NOW+'</p>';return}
   BROWSE.starting=true;renderRooms();
   try{
     const watch=c=>{c.on('message',(topic,buf)=>{
@@ -923,8 +932,8 @@ function renderRooms(){
   const el=$('roomList');if(!el)return;const now=Date.now();
   for(const[k,r]of BROWSE.rooms)if(now-r.seen>15000||r.n<1)BROWSE.rooms.delete(k);
   const rooms=[...BROWSE.rooms.values()].sort((a,b)=>(a.racing-b.racing)||(b.n-a.n));
-  const sc=$('roomScan');if(sc)sc.textContent=BROWSE.on?`· ${rooms.length} open`:'· searching…';
-  if(!rooms.length){el.innerHTML=`<p class="empty">${BROWSE.on?'No runs open right now. Host one and it shows up here for everyone.':'Looking for open runs…'}</p>`;return}
+  const sc=$('roomScan');if(sc)sc.textContent=isOff()?'· offline':BROWSE.on?`· ${rooms.length} open`:'· searching…';
+  if(!rooms.length){el.innerHTML=`<p class="empty">${isOff()?OFFLINE_NOW:BROWSE.on?'No runs open right now. Host one and it shows up here for everyone.':'Looking for open runs…'}</p>`;return}
   el.innerHTML=rooms.map(r=>{const full=r.n>=r.max;return`<div class="rm"><div><b>${escH(r.name)}</b><small>${r.n}/${r.max} mice · ${escH(r.track)}${r.racing?' · running':''} · ${escH(r.code)}</small></div>
     <button class="btn sm" data-act="join" data-code="${escH(r.code)}" data-b="${r.b}" ${full?'disabled':''}>${full?'Full':'Join'}</button></div>`}).join('');
 }
@@ -966,6 +975,8 @@ document.addEventListener('visibilitychange',()=>{
   sayAway(false);
 });
 addEventListener('pagehide',()=>{leaveRoom(true);stopBrowse()});
+addEventListener('online',()=>{if(mpStep==='choose'&&state==='menu'&&!ov.hidden&&$('roomList')){mpStatus('');startBrowse()}});
+addEventListener('offline',()=>{if(NET.active)toast('Lost service. Your run keeps going.','#ffb27a')});
 function hostGone(why){if(!NET.active||NET.isHost)return;leaveRoom();ghosts.clear();showMp('choose');mpStatus(typeof why==='string'?why:'The host closed the room.',true)}
 function relay(d,except){if(NET.isHost&&NET.mq)pub(NET.mq,rTopic(NET.code,'a'),except?{x:except,d}:{d})}
 function netSend(d){if(!NET.active)return;if(NET.isHost)relay(d,null);else if(NET.hostConn){try{NET.hostConn.send(d)}catch(e){}}}
@@ -1039,6 +1050,7 @@ function mpWon(){
 }
 
 resize();startMap(0);showMenu();checkInvite();requestAnimationFrame(frame);
+try{if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(_){}
 })();
 </script>
 </body>

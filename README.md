@@ -6,6 +6,11 @@ A mobile stick-figure platformer in one HTML file. You're a ninja mouse running 
 
 Hold your phone sideways to play.
 
+## Play offline
+Open the game once with service and it saves itself on your phone. After that it opens and plays with no service at all (solo runs; multiplayer needs a connection). For the best version, add it to your home screen: on iPhone tap Share → **Add to Home Screen**, on Android tap ⋮ → **Add to Home screen** or **Install app**. It opens full screen and sideways like a real app.
+
+When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`) so phones pick up the new version. Phones also fetch the newest copy in the background whenever they're online.
+
 ## Journeys
 - **Pine Ridge:** snowcapped ridges, pine forest and tall waterfalls
 - **Riverstone Gorge:** mossy boulders, white-water rivers and waterfalls
@@ -36,3 +41,5 @@ It uses the same setup as Riptide Rally: free public MQTT relays over secure web
 ## Files
 - `index.html`: the whole game
 - `join.html`: invite link landing page that drops friends into your room
+- `sw.js`: saves the game on the phone for offline play
+- `manifest.webmanifest`, `icons/`: home-screen install and app icon
