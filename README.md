@@ -24,8 +24,8 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 | Drag your left thumb on the left side | A D / ← → | Move |
 | JUMP | Space / W / ↑ | Jump. Tap again in the air to double jump, or jump off a cliff wall |
 | Hold JUMP while falling | Hold Space | Glide |
-| Tap the sky or a rock (right side) | Click | Grapple. Hold to swing, let go to fling. Aims for the nearest ledge |
-| Left thumb up / down while swinging | ↑ / ↓ | Climb or lower the rope |
+| Tap a cloud ring, lantern or rock (right side) | Click | Grapple. Hold and the rope pulls you up to it, then launches you into the sky. Let go anytime to fly free |
+| Hold left thumb down while hooked | Hold ↓ | Swing on the rope instead of being pulled |
 | DASH | Shift / J / K | Dash, aimed with your left thumb or the arrow keys |
 | ⏸ | P / Esc | Pause |
 

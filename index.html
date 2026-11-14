@@ -245,7 +245,7 @@ onHook=(sx,sy)=>{
   P.hook={mode:'fly',x:ox,y:oy,tx:a.x,ty:a.y,ref:a.ref||null,rel:false,minT:0,len:0};sfx.hook();
 };
 onRelease=()=>{const h=P.hook;if(!h)return;if(h.mode==='fly'){h.rel=true;return}if(h.mode==='on'){if(time<h.minT)h.rel=true;else dropHook(true)}};
-function dropHook(boost){const h=P.hook;P.hook=null;if(h&&h.mode==='on'){P.jumps=Math.max(P.jumps,1);P.cut=false;if(boost){P.vx*=1.08;P.vy=P.vy<0?P.vy*1.08-70:P.vy*.85-40}burst(h.tx,h.ty,5,'#ffd7a8',120,.4,200)}}
+function dropHook(boost){const h=P.hook;P.hook=null;if(h&&h.mode==='on'){P.jumps=Math.max(P.jumps,1);P.cut=false;if(h.pull)P.float=.4;if(boost){P.vx*=1.08;P.vy=P.vy<0?P.vy*1.08-70:P.vy*.85-40}burst(h.tx,h.ty,5,'#ffd7a8',120,.4,200)}}
 
 function updateHook(dt,ax,ay){
   const h=P.hook;if(!h)return;const hx=P.x,hy=P.y-30;
@@ -254,19 +254,36 @@ function updateHook(dt,ax,ay){
     h.x=hx;h.y=hy;if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
     const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=4400*dt;
-    if(dd<=st){h.mode='on';h.len=clamp(Math.hypot(h.tx-hx,h.ty-hy),70,RANGE);h.minT=time+.32;P.dashes=1;P.ground=false;sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
+    if(dd<=st){h.mode='on';const L=Math.hypot(h.tx-hx,h.ty-hy)||1;h.len=clamp(L,40,RANGE);h.minT=time+.32;P.dashes=1;P.ground=false;
+      P.vx+=(h.tx-hx)/L*220;P.vy+=(h.ty-hy)/L*220;   // a tug the moment it bites
+      sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
     else{h.tipx+=dx/dd*st;h.tipy+=dy/dd*st}
     return;
   }
   if(h.rel&&time>=h.minT){dropHook(true);return}
   if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
-  if(ay<-.4)h.len=Math.max(70,h.len-320*dt);else if(ay>.4)h.len=Math.min(RANGE,h.len+240*dt);
-  else if(h.len>210&&!P.ground)h.len=Math.max(210,h.len-80*dt);   // long ropes ease in so the swing arcs instead of dragging
-  P.vy+=1500*dt;
-  const dx=hx-h.tx,dy=hy-h.ty,d=Math.hypot(dx,dy)||1,tx=dy/d,ty=-dx/d;   // tangent of the swing, pointing forward (right)
-  if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
+  const dx=hx-h.tx,dy=hy-h.ty,d=Math.hypot(dx,dy)||1,ux=-dx/d,uy=-dy/d,tx=dy/d,ty=-dx/d;   // u: toward the hook, t: along the swing (forward)
+  h.pull=!(ay>.4);
+  if(h.pull){
+    /* reel in: the rope hauls you toward what you hooked, up into the sky or onto the rock, and keeps your sideways speed so you curve */
+    P.vx+=ux*3300*dt;P.vy+=uy*3300*dt;P.vy+=650*dt;
+    h.len=Math.max(30,Math.min(h.len,d+1));
+    if(ax){const push=ax*900*dt;P.vx+=tx*push;P.vy+=ty*push}
+    if(d<58){zipOff(h,ux,uy);return}
+  }else{
+    /* thumb down: plain swing on a longer rope */
+    h.len=Math.min(RANGE,h.len+240*dt);P.vy+=1500*dt;
+    if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
+  }
   P.vx*=1-.04*dt;P.vy*=1-.04*dt;
-  const sp=Math.hypot(P.vx,P.vy);if(sp>1150){P.vx*=1150/sp;P.vy*=1150/sp}
+  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?1250:1150;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
+}
+/* reaching the hook: let go and keep flying with all your speed, plus a pop so you clear the ledge or rise past the lantern */
+function zipOff(h,ux,uy){
+  P.hook=null;P.jumps=Math.max(P.jumps,1);P.dashes=1;P.cut=false;P.float=.5;
+  const sp=Math.hypot(P.vx,P.vy);if(sp<520){const k=520/(sp||1);P.vx*=k;P.vy*=k}
+  P.vy=Math.min(P.vy,0)-(uy<-.3?260:160);
+  sfx.air();burst(h.tx,h.ty,10,'#fff2c4',200,.4,150);
 }
 /* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
 function ropeConstrain(){
@@ -312,7 +329,7 @@ function update(dt){
   let ax=clamp(stick.x+(kHeld('ArrowRight','KeyD')?1:0)-(kHeld('ArrowLeft','KeyA')?1:0),-1,1);
   let ay=clamp(stick.y+(kHeld('ArrowDown','KeyS')?1:0)-(kHeld('ArrowUp')?1:0),-1,1);
   const jh=inp.jumpTouch>0||kHeld('Space','ArrowUp','KeyW');
-  inp.jumpBuf-=dt;inp.dashBuf-=dt;p.dashCd-=dt;p.inv-=dt;p.land-=dt;
+  inp.jumpBuf-=dt;inp.dashBuf-=dt;p.dashCd-=dt;p.inv-=dt;p.land-=dt;p.float=(p.float||0)-dt;
   if(ax>.2)p.face=1;else if(ax<-.2)p.face=-1;
   if(p.ground){p.coyote=.1;p.jumps=2;if(p.dashT<=0)p.dashes=1}else{p.coyote-=dt;if(p.coyote<=0&&p.jumps>1)p.jumps=1}
 
@@ -344,7 +361,7 @@ function update(dt){
         const tv=ax>.2?Math.max(400,p.vx*.995):ax<-.2?Math.min(-190,p.vx*.995):(Math.abs(p.vx)>250?p.vx*.995:p.face*250);p.vx=lerp(p.vx,tv,1-Math.exp(-2.6*dt));
         if(Math.random()<.5)parts.push({x:p.x-p.face*12,y:p.y-34,vx:-p.face*40,vy:10,l:.5,m:.5,c:'#ffffffaa',g:0,r:2})
       }else{
-        if(p.vy>=0)p.cut=false;const g=(p.vy<0&&!jh&&p.cut)?2700:1500;p.vy=Math.min(p.vy+g*dt,1100);
+        if(p.vy>=0)p.cut=false;const g=((p.vy<0&&!jh&&p.cut)?2700:1500)*(p.float>0?.5:1);p.vy=Math.min(p.vy+g*dt,1100);
         const tv=ax*310;let ac=p.ground?(ax?2600:2800):(ax?1200:60);
         if(!p.ground&&ax&&Math.sign(p.vx)===Math.sign(tv)&&Math.abs(p.vx)>Math.abs(tv))ac=120;
         if(p.vx<tv)p.vx=Math.min(tv,p.vx+ac*dt);else if(p.vx>tv)p.vx=Math.max(tv,p.vx-ac*dt);
@@ -600,7 +617,7 @@ function draw(){
   drawRiver(t,vx0,vx1);
   /* grapple rope */
   const h=P.hook;if(h){let tx,ty;if(h.mode==='fly'){tx=h.tipx??P.x;ty=h.tipy??P.y-30}else if(h.mode==='on'){tx=h.tx;ty=h.ty}else{const k=1-h.t/.18;tx=lerp(P.x,h.tx,k);ty=lerp(P.y-30,h.ty,k)}
-    ctx.strokeStyle=h.mode==='miss'?'rgba(255,255,255,.5)':'#ffe2a8';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(P.x,P.y-30);
+    ctx.strokeStyle=h.mode==='miss'?'rgba(255,255,255,.5)':h.pull?'#fff6d8':'#ffe2a8';ctx.lineWidth=h.mode==='on'&&h.pull?3:2.5;ctx.beginPath();ctx.moveTo(P.x,P.y-30);
     if(h.mode==='fly'){ctx.quadraticCurveTo((P.x+tx)/2,(P.y-30+ty)/2+18,tx,ty)}else ctx.lineTo(tx,ty);ctx.stroke();
     ctx.fillStyle='#ffd58a';ctx.beginPath();ctx.arc(tx,ty,4,0,6.283);ctx.fill()}
   /* other players */
@@ -668,7 +685,7 @@ const KEYS=`<ul class="keys">
 <li><b>Move</b><span>${coarse?'Drag your left thumb anywhere on the left side':'A / D or arrow keys'}</span></li>
 <li><b>Jump</b><span>${coarse?'JUMP button':'Space'}. Tap again in the air to double jump, or push off a cliff wall</span></li>
 <li><b>Glide</b><span>Hold jump while falling to open your leaf glider</span></li>
-<li><b>Grapple</b><span>${coarse?'Tap the sky or a rock with your right thumb':'Click a rock or a ring'}. Hold to swing, let go to fling. It aims for the nearest ledge</span></li>
+<li><b>Grapple</b><span>${coarse?'Tap the sky or a rock with your right thumb':'Click a ring, lantern or rock'}. Hold to get pulled up to it and launch into the sky; let go anytime to fly free. Hold your left thumb down to swing instead</span></li>
 <li><b>Dash</b><span>${coarse?'DASH button, aimed with your left thumb':'Shift, aimed with the arrow keys'}. Recharges on landing or grappling</span></li></ul>`;
 function showMenu(){
   state='menu';ov.hidden=false;
@@ -1050,6 +1067,7 @@ function mpWon(){
 }
 
 resize();startMap(0);showMenu();checkInvite();requestAnimationFrame(frame);
+if(/[?&]debug/.test(location.search))window.__nm={P,get cat(){return cat},get state(){return state}};
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(_){}
 })();
 </script>
