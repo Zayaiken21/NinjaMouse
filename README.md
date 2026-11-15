@@ -15,6 +15,9 @@ When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`)
 - **Pine Ridge:** snowcapped ridges, pine forest and tall waterfalls
 - **Riverstone Gorge:** mossy boulders, white-water rivers and waterfalls
 - **Glacier Pass:** icy peaks under the aurora, frozen falls and falling snow
+- **Bamboo Wind Valley:** misty bamboo groves where gusts push you around in the air
+- **Stormfall Peaks:** a night storm with lightning, fast rivers and ledges that crumble if you stand still
+- **Geyser Mesa:** sunset desert mesas, cacti and geysers that blast you skyward when they erupt
 
 Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
 
@@ -24,7 +27,14 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 - **Rolling boulders** that tumble along the rocks and off the edge
 - **Hawks** patrolling the sky between rocks, right where you fly
 
+## Journey challenges
+- **Wind (Bamboo Wind Valley):** gusts shove you sideways while you're in the air, then ease off. Steer against them or dash through. Grounded and you're safe.
+- **Crumbling ledges (Stormfall Peaks):** some rocks start to crack as soon as you land. Stay about half a second and they drop away, then come back a few seconds later.
+- **Geysers (Geyser Mesa):** vents erupt every few seconds with a ring of bubbles just before. Step in the column to be thrown high, and grapple from the top.
+
 Getting hit knocks you back and drops your grapple, so the cat gains on you. Dashing passes straight through everything. Obstacles get more common the further you run.
+
+The game keeps itself smooth: if frames stay slow it quietly lowers the drawing resolution a step.
 
 ## Controls
 | Phone | Keyboard | Action |

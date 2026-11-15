@@ -89,23 +89,30 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d'),ov=document.getEle
 const lerp=(a,b,t)=>a+(b-a)*t,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const hash=n=>{n=Math.sin(n*127.1+311.7)*43758.5453;return n-Math.floor(n)};
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-let W=800,H=360,DPR=1,S=1,Z=1;
-function resize(){const r=cv.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(150,r.height);DPR=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=H/560}
+let W=800,H=360,DPR=1,S=1,Z=1,DPRMAX=2;
+function resize(){const r=cv.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(150,r.height);DPR=Math.min(window.devicePixelRatio||1,DPRMAX);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=H/560}
 addEventListener('resize',resize);
 
 /* ---------- journeys (maps) ---------- */
 const WATER_Y=690;
 const MAPS=[
-{name:'Pine Ridge',blurb:'Snowcapped ridges, pine forest and tall waterfalls.',finish:21000,cat:205,gap:[90,225],w:[170,330],dy:120,top:[300,520],ground:'rock',fall:.32,tree:.75,
+{name:'Pine Ridge',blurb:'Snowcapped ridges, pine forest and tall waterfalls.',finish:21000,cat:205,gap:[90,225],w:[170,330],dy:120,top:[300,520],ground:'rock',fall:.32,treeP:.75,
  sky:['#6fa8e6','#f4d3a8','#ffe9c8'],sun:'#fff0bf',moon:false,far:['#9db6d6','#7692b8','#4f6f93'],snow:'#f6faff',fog:'#f1dfc6',rock:['#7a7480','#4c4856'],cap:'#78c95a',tree:'#2d6a47',tree2:'#3f8a58',
  water:['#46b4c4','#15586d'],rim:'#ffe4b4',flow:60,rain:true},
-{name:'Riverstone Gorge',blurb:'Mossy boulders, white-water rivers and waterfalls.',finish:24000,cat:225,gap:[110,250],w:[120,260],dy:150,top:[330,540],ground:'boulder',fall:.4,tree:.45,
+{name:'Riverstone Gorge',blurb:'Mossy boulders, white-water rivers and waterfalls.',finish:24000,cat:225,gap:[110,250],w:[120,260],dy:150,top:[330,540],ground:'boulder',fall:.4,treeP:.45,
  sky:['#f09a52','#f6c383','#ffe6bd'],sun:'#fff2c0',moon:false,far:['#c98558','#a0623f','#6d432f'],snow:'#fbe9d2',fog:'#f2cfa2',rock:['#86645a','#523d3a'],cap:'#8bc34a',tree:'#3a6b3a',tree2:'#58893f',
  water:['#35a8bd','#0e4d66'],rim:'#ffd9a0',flow:120,rain:true},
-{name:'Glacier Pass',blurb:'Icy peaks under the aurora, frozen falls and meltwater.',finish:27000,cat:245,gap:[130,280],w:[100,230],dy:165,top:[260,540],ground:'ice',fall:.28,tree:.5,
+{name:'Glacier Pass',blurb:'Icy peaks under the aurora, frozen falls and meltwater.',finish:27000,cat:245,gap:[130,280],w:[100,230],dy:165,top:[260,540],ground:'ice',fall:.28,treeP:.5,
  sky:['#0b1a3c','#2b3f7c','#8173b4'],sun:'#e8f0ff',moon:true,far:['#7088c0','#566ca4','#3a4878'],snow:'#f2f8ff',fog:'#a9b6e2',rock:['#8296b8','#4d5d84'],cap:'#eef6ff',tree:'#1f4d5c',tree2:'#2d6a78',
- water:['#92d6ea','#2b6e92'],rim:'#cfe2ff',flow:45,rain:false}
+ water:['#92d6ea','#2b6e92'],rim:'#cfe2ff',flow:45,rain:false},
+{name:'Bamboo Wind Valley',blurb:'Misty bamboo groves, gusts shove you around',tip:'Gusts push you in the air. Steer against them',finish:22000,cat:235,gap:[110,235],w:[150,300],dy:110,top:[300,520],ground:'rock',fall:.2,treeP:.9,wind:1,bamboo:true,
+ sky:['#8fd3c0','#d9f2c9','#f8fbe4'],sun:'#fffbe0',moon:false,far:['#7fb3a0','#5a9484','#3d6f63'],snow:'#eef9ee',fog:'#dff2e0',rock:['#6f8a6a','#3f5a44'],cap:'#9be36a',tree:'#2c6b3f',tree2:'#4f8a4f',water:['#6ccbd0','#23707a'],rim:'#e6fff0',flow:50,rain:false},
+{name:'Stormfall Peaks',blurb:'Night storm peaks, ledges crumble under you',tip:'Ledges crumble if you stand still. Keep moving',finish:23000,cat:255,gap:[120,230],w:[110,220],dy:120,top:[280,500],ground:'rock',fall:.3,treeP:.5,hazard:'crumble',storm:true,
+ sky:['#141033','#2e2360','#5b4a9a'],sun:'#8f86d6',moon:false,far:['#3b3560','#2a2748','#1c1a33'],snow:'#9aa6e0',fog:'#4a3f7a',rock:['#5a5570','#2d2a40'],cap:'#b9b3e6',tree:'#1e2d3f',tree2:'#26394f',water:['#5a6fd0','#1f2a63'],rim:'#c7d2ff',flow:150,rain:false},
+{name:'Geyser Mesa',blurb:'Desert mesas, geysers launch you skyward',tip:'Geysers blow every few seconds. Ride them up',finish:24000,cat:245,gap:[120,250],w:[150,270],dy:100,top:[320,520],ground:'rock',fall:.25,treeP:.6,hazard:'geyser',cactus:true,
+ sky:['#ff6b4a','#ff9a5c','#ffd28a'],sun:'#fff0b0',moon:false,far:['#c9704a','#9c4b35','#6e3328'],snow:'#ffd9b0',fog:'#f5b98a',rock:['#d98a58','#8e4a31'],cap:'#e9c27a',tree:'#5c6b2f',tree2:'#7a8a3a',water:['#49c2d6','#1d6f86'],rim:'#fff0d0',flow:90,rain:false}
 ];
+
 let best={};try{best=JSON.parse(localStorage.getItem('skyswing-best')||'{}')||{}}catch(_){best={}}
 function saveBest(){try{localStorage.setItem('skyswing-best',JSON.stringify(best))}catch(_){}}
 
@@ -131,6 +138,8 @@ function genUntil(lim){
     if(rng()<.22+.4*ramp)obst.push({k:'hawk',x:genX+gap*.5,y:clamp(hi-lerp(150,330,rng()),-170,330),r:lerp(120,260,rng()),p:rng()*6});
     if(gap>110){const n=2+(rng()*3|0);for(let i=0;i<n;i++){const t=(i+1)/(n+1);shards.push({x:genX+gap*t,y:hi-70-Math.sin(t*Math.PI)*60-rng()*30,got:false,p:rng()*6})}}
     const s=addChunk(gx,top,w,M.ground);
+    if(M.hazard==='crumble'&&w<300&&rng()<.6)s.crumble=true;
+    if(M.hazard==='geyser'&&w>150&&rng()<.7)obst.push({k:'geyser',x:gx+w*(.3+rng()*.4),y:top,per:2.8+rng()*1.2,ph:rng()*4,dur:1.1,en:-1});
     {const dens=.28+.4*ramp,used=[];
      const pick=ww=>{for(let k=0;k<4;k++){const ox=gx+45+rng()*Math.max(1,w-90-ww);if(!used.some(u=>ox<u[1]+30&&ox+ww>u[0]-30)){used.push([ox,ox+ww]);return ox}}return null};
      if(w>140&&rng()<dens){const ox=pick(34);if(ox!=null)obst.push({k:'thorn',x:ox,y:top,w:34})}
@@ -138,13 +147,13 @@ function genUntil(lim){
      if(w>220&&rng()<dens*.6)obst.push({k:'boulder',x:gx,x0:gx,x1:gx+w,y:top,p:rng(),sp:110+rng()*90});}
     if(w>190&&rng()<.6)anchors.push({x:gx+w*(.3+rng()*.4),y:clamp(top-lerp(270,360,rng()),-140,300),k:rng()<.5?'cloud':'lantern',p:rng()*6});
     if(w>150&&rng()<M.fall)s.fall={side:rng()<.6?1:-1,w:14+rng()*12,flow:rng()};
-    if(rng()<M.tree){const n=Math.max(1,Math.floor(w/110*rng()+.5));for(let i=0;i<n;i++)trees.push({x:gx+24+rng()*(w-48),y:top,h:lerp(90,210,rng()),k:rng()})}
+    if(rng()<M.treeP){const n=Math.max(1,Math.floor(w/110*rng()+.5));for(let i=0;i<n;i++)trees.push({x:gx+24+rng()*(w-48),y:top,h:lerp(90,210,rng()),k:rng()})}
     lastTop=top;genX=gx+w;
   }
 }
 function groundTopAt(x){
   let prev=null,next=null;
-  for(const s of solids){if(s.type==='arch')continue;
+  for(const s of solids){if(s.type==='arch'||s.gone)continue;
     if(x>=s.x&&x<=s.x+s.w)return s.y;
     if(s.x+s.w<x&&(!prev||s.x>prev.x))prev=s;
     if(s.x>x&&(!next||s.x<next.x))next=s}
@@ -226,13 +235,13 @@ function startMap(i,seed){
   addChunk(-300,480,820,map.ground);genX=520;lastTop=480;genUntil(2600);
   Object.assign(P,{x:140,y:480,vx:0,vy:0,face:1,ground:true,coyote:0,jumps:2,dashes:1,dashT:0,dashCd:0,rollT:0,rollCd:0,gliding:false,hook:null,wall:0,inv:1,safe:{x:140,y:480},trail:[],land:0});
   Object.assign(cat,{x:-300,y:480,speed:map.cat,t:0,roarT:3});
-  parts=[];shake=0;levelT=0;shards_got=0;hintT=7;time=0;ended=null;winX=0;
+  parts=[];shake=0;flashAt=-9;nextFlash=2;levelT=0;shards_got=0;hintT=7;time=0;ended=null;winX=0;
   cam.x=P.x-W/S*.3;cam.y=P.y-300;clearInput();
 }
 function burst(x,y,n,col,sp,life,g){for(let i=0;i<n;i++){const a=Math.random()*6.283,v=(.3+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-sp*.2,l:life*(.6+Math.random()*.6),m:life,c:col,g:g==null?500:g,r:2+Math.random()*2.5})}}
 
 /* grapple targeting: ray first, then aim assist toward nearby ledges */
-function inSolid(x,y){for(const s of solids){if(x>=s.x&&x<=s.x+s.w&&y>=s.y&&y<=s.y+s.h)return true}return false}
+function inSolid(x,y){for(const s of solids){if(s.gone)continue;if(x>=s.x&&x<=s.x+s.w&&y>=s.y&&y<=s.y+s.h)return true}return false}
 const apos=a=>a.k==='lantern'?[a.x+Math.sin(time*.7+a.p)*6,a.y+Math.sin(time*1.3+a.p)*9]:[a.x+Math.sin(time*.4+a.p)*10,a.y+Math.sin(time*.9+a.p)*4];
 function findAnchor(ox,oy,dx,dy){
   const near=[];for(const a of anchors){const[ax,ay]=apos(a);const d=Math.hypot(ax-ox,ay-oy);if(d<=RANGE+20&&d>40)near.push([a,ax,ay])}
@@ -295,6 +304,7 @@ function zipOff(h,ux,uy){
   sfx.air();burst(h.tx,h.ty,10,'#fff2c4',200,.4,150);
 }
 /* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
+function windAt(x){return map.wind?map.wind*340*(Math.sin(x*.0011+.7)+.5*Math.sin(x*.0037+time*.6)):0}
 function ropeConstrain(){
   const h=P.hook;if(!h||h.mode!=='on')return;const dx=P.x-h.tx,dy=P.y-30-h.ty,d=Math.hypot(dx,dy)||1;
   if(d<=h.len)return;const nx=dx/d,ny=dy/d,ex=d-h.len;P.x-=nx*ex;P.y-=ny*ex;
@@ -305,7 +315,7 @@ function ropeConstrain(){
 
 function resolveX(dt){
   P.wall=0;P.x+=P.vx*dt;
-  for(const s of solids){if(s.type==='arch')continue;
+  for(const s of solids){if(s.type==='arch'||s.gone)continue;
     if(P.x+8>s.x&&P.x-8<s.x+s.w&&P.y>s.y+1&&P.y-40<s.y+s.h){
       if(P.y-s.y<=14&&P.vy>=-50){P.y=s.y;P.vy=Math.min(P.vy,0)}
       else{if(P.vx>=0&&P.x<s.x+s.w*.5){P.x=s.x-8;P.wall=1}else{P.x=s.x+s.w+8;P.wall=-1}if(P.vx*P.wall<0||P.vx*P.wall===0)P.vx=0;else P.vx=0}
@@ -313,10 +323,11 @@ function resolveX(dt){
   }
 }
 function resolveY(dt){
-  const py=P.y;P.y+=P.vy*dt;let landed=false;
-  if(P.vy>=0)for(const s of solids){
-    if(P.x+7>s.x&&P.x-7<s.x+s.w&&py<=s.y+4&&P.y>=s.y){P.y=s.y;P.vy=0;landed=true;if(s.type!=='arch'){P.safe.x=clamp(P.x,s.x+14,s.x+s.w-14);P.safe.y=s.y}}
+  const py=P.y;P.y+=P.vy*dt;let landed=false,ls=null;
+  if(P.vy>=0)for(const s of solids){if(s.gone)continue;
+    if(P.x+7>s.x&&P.x-7<s.x+s.w&&py<=s.y+4&&P.y>=s.y){P.y=s.y;P.vy=0;landed=true;ls=s;if(s.type!=='arch'){P.safe.x=clamp(P.x,s.x+14,s.x+s.w-14);P.safe.y=s.y}}
   }
+  P.on=landed?ls:null;
   if(landed){if(!P.ground&&P.land<=0){sfx.land();burst(P.x,P.y,5,'#e8dccb',90,.35,300);P.land=.1}P.ground=true}else P.ground=false;
 }
 
@@ -399,7 +410,16 @@ function update(dt){
       if(p.wall!==0&&!p.ground&&p.vy>140)p.vy=140;
     }
   }
+  /* geysers blow you up while they're erupting */
+  for(const o of obst)if(o.k==='geyser'){const en=Math.floor((time+o.ph)/o.per);if(en!==o.en){o.en=en;if(Math.abs(o.x-P.x)<300)sfx.air()}
+    if((time+o.ph)%o.per<o.dur&&Math.abs(o.x-P.x)<30&&P.y<o.y+12&&P.y>o.y-470){P.vy-=2600*dt;P.ground=false}}
+  /* wind gusts push you while you're in the air */
+  if(map.wind&&!P.ground&&P.dashT<=0)P.vx+=windAt(P.x)*dt;
   resolveX(dt);resolveY(dt);ropeConstrain();
+  /* crumbling ledges fall a moment after you stop on them, then come back */
+  if(P.on!==P.lastOn){if(P.lastOn)P.lastOn.ct=0;P.lastOn=P.on}
+  if(P.on&&P.on.crumble&&!P.on.gone&&P.ground){P.on.ct=(P.on.ct||0)+dt;if(P.on.ct>.6){const s=P.on;s.gone=true;s.back=time+2.6;burst(s.x+s.w/2,s.y+10,16,map.rock[0],170,.6,500);sfx.land()}}
+  for(const s of solids)if(s.gone&&s.back&&time>s.back){s.gone=false;s.ct=0;s.back=0}
   if(p.hook&&p.hook.mode==='on'&&p.ground&&p.vy>=0){/* rope hanging while standing: fine */}
   p.anim+=dt*(p.ground?Math.abs(p.vx)/42:3);
   for(const t of p.trail)t.a-=dt*2.4;p.trail=p.trail.filter(t=>t.a>0);
@@ -411,7 +431,7 @@ function update(dt){
   }
   /* obstacles: dashing passes through anything, rolling ducks under logs and low hawks */
   if(p.inv<=0&&p.dashT<=0){const top=p.y-(p.rollT>0?18:40);
-    for(const o of obst){let hit=false;
+    for(const o of obst){if(o.k==='geyser')continue;let hit=false;
       if(o.k==='thorn'){if(Math.abs(o.x-p.x)>60)continue;hit=p.x+8>o.x+3&&p.x-8<o.x+o.w-3&&p.y>o.y-20&&top<o.y}
       else if(o.k==='log'){if(Math.abs(o.x-p.x)>110)continue;hit=p.x+8>o.x&&p.x-8<o.x+o.w&&p.y>o.y-50&&top<o.y-27}
       else{const q=opos(o);if(q[2]||Math.abs(q[0]-p.x)>80)continue;const qx=clamp(q[0],p.x-8,p.x+8),qy=clamp(q[1],top,p.y);hit=Math.hypot(q[0]-qx,q[1]-qy)<(o.k==='hawk'?20:18)}
@@ -432,6 +452,7 @@ function update(dt){
   if(solids.length>40){const lim=Math.min(p.x,cat.x)-2200;solids=solids.filter(s=>s.x+s.w>lim);trees=trees.filter(t=>t.x>lim);shards=shards.filter(s=>s.x>lim);anchors=anchors.filter(a=>a.x>lim);obst=obst.filter(o=>(o.x1||o.x)>lim)}
   for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.g*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);if(parts.length>400)parts.splice(0,parts.length-400);
   shake=Math.max(0,shake-dt);
+  if(map.wind&&Math.random()<.4){const x=cam.x+Math.random()*W/S,y=cam.y+Math.random()*H/S;parts.push({x,y,vx:windAt(x)*.8,vy:0,l:.5,m:.5,c:'rgba(255,255,255,.5)',g:0,r:1.5})}
   /* camera */
   const vw=W/S;cam.look=lerp(cam.look||0,clamp(p.vx*.32,-140,280),1-Math.exp(-2.2*dt));
   const tx=p.x-vw*.32+cam.look,ty=clamp(p.y-300,-900,WATER_Y-440);
@@ -445,12 +466,15 @@ function ridge(x,L){const a=x*.0016,b=x*.0041,c=x*.011;return Math.sin(a+L*1.7)*
 function drawSky(t){
   const M=map,g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,M.sky[0]);g.addColorStop(.62,M.sky[1]);g.addColorStop(1,M.sky[2]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   if(M.moon){ /* stars + aurora */
-    for(let i=0;i<90;i++){const x=hash(i)*W,y=hash(i+99)*H*.55,tw=.4+.6*Math.abs(Math.sin(t*1.3+i));ctx.fillStyle=`rgba(255,255,255,${.25+.55*tw*hash(i+7)})`;ctx.fillRect(x,y,1.6,1.6)}
-    for(let k=0;k<3;k++){ctx.beginPath();const base=H*(.16+k*.07);for(let x=0;x<=W+20;x+=20){const y=base+Math.sin(x*.006+t*.35+k*2)*H*.05+Math.sin(x*.017-t*.5)*H*.015;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}
-      ctx.lineWidth=H*.07;ctx.strokeStyle=k===1?'rgba(170,120,255,.16)':'rgba(110,255,190,.16)';ctx.stroke();ctx.lineWidth=H*.025;ctx.strokeStyle=k===1?'rgba(200,160,255,.2)':'rgba(150,255,210,.22)';ctx.stroke()}
+    if(!starCv||starCv.width!==Math.round(W)||starCv.height!==Math.round(H*.55)){starCv=document.createElement('canvas');starCv.width=Math.round(W);starCv.height=Math.round(H*.55);const sc=starCv.getContext('2d');
+      for(let i=0;i<90;i++){sc.fillStyle='rgba(255,255,255,'+(.2+.4*hash(i+7)).toFixed(2)+')';sc.fillRect(hash(i)*W,hash(i+99)*H*.55,1.6,1.6)}}
+    ctx.drawImage(starCv,0,0);
+    ctx.fillStyle='#ffffff';for(let i=0;i<10;i++){ctx.globalAlpha=.3+.6*Math.abs(Math.sin(t*1.7+i*2.1));ctx.fillRect(hash(i*3+1)*W,hash(i*3+2)*H*.5,2,2)}ctx.globalAlpha=1;
+    for(let k=0;k<3;k++){ctx.beginPath();const base=H*(.16+k*.07);for(let x=0;x<=W+40;x+=40){const y=base+Math.sin(x*.006+t*.35+k*2)*H*.05+Math.sin(x*.017-t*.5)*H*.015;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+      ctx.lineWidth=H*.06;ctx.strokeStyle=k===1?'rgba(185,140,255,.2)':'rgba(130,255,200,.2)';ctx.stroke()}
   }
   const sx=W*.74,sy=H*(M.moon?.2:.34),sr=H*(M.moon?.06:.09),sg=ctx.createRadialGradient(sx,sy,sr*.4,sx,sy,sr*4.5);
-  sg.addColorStop(0,M.sun);sg.addColorStop(.25,M.sun+'66');sg.addColorStop(1,M.sun+'00');ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
+  sg.addColorStop(0,M.sun);sg.addColorStop(.25,M.sun+'66');sg.addColorStop(1,M.sun+'00');ctx.fillStyle=sg;ctx.fillRect(sx-sr*4.5,sy-sr*4.5,sr*9,sr*9);
   ctx.fillStyle=M.sun;ctx.beginPath();ctx.arc(sx,sy,sr,0,6.283);ctx.fill();
   if(M.moon){ctx.fillStyle=M.sky[0]+'cc';ctx.beginPath();ctx.arc(sx+sr*.42,sy-sr*.2,sr*.86,0,6.283);ctx.fill()}
   /* clouds */
@@ -476,7 +500,7 @@ function drawSky(t){
   ctx.fillStyle=map.tree+'cc';ctx.beginPath();ctx.moveTo(0,H);
   for(let x=0;x<=W+10;x+=10)ctx.lineTo(x,hb-H*.06*(1+Math.sin((x+off)*.004)));ctx.lineTo(W,H);ctx.fill();
   const step=H*.07,k0=Math.floor(off/step);
-  for(let k=k0;k<k0+W/step+2;k++){const x=k*step-off+hash(k)*step*.5,h=H*(.08+hash(k+5)*.08),y=hb-H*.06*(1+Math.sin((x+off)*.004))+4;
+  for(let k=k0;k<(map.cactus||map.bamboo?k0:k0+W/step+2);k++){const x=k*step-off+hash(k)*step*.5,h=H*(.08+hash(k+5)*.08),y=hb-H*.06*(1+Math.sin((x+off)*.004))+4;
     ctx.beginPath();ctx.moveTo(x,y-h);ctx.lineTo(x+h*.28,y);ctx.lineTo(x-h*.28,y);ctx.fill()}
 }
 
@@ -509,6 +533,8 @@ function drawSolid(s,t){
   /* grass / snow cap with tufts */
   ctx.fillStyle=M.cap;ctx.beginPath();ctx.moveTo(s.x+2,s.y+8);ctx.lineTo(s.x+4,s.y-2);ctx.lineTo(s.x+s.w-4,s.y-2);ctx.lineTo(s.x+s.w-2,s.y+8);
   for(let x=s.x+s.w-4;x>s.x+4;x-=12)ctx.lineTo(x,s.y+8+((x*7|0)%9));ctx.closePath();ctx.fill();
+  if(s.crumble){ctx.strokeStyle='rgba(20,10,30,.55)';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<4;i++){const x=s.x+s.w*(.15+.2*i+(s.r[i]-.5)*.1);ctx.moveTo(x,s.y+6);ctx.lineTo(x+(s.r[i+2]-.5)*14,s.y+30+s.r[i+4]*40)}ctx.stroke();
+    if(s.ct>0){ctx.fillStyle='rgba(255,230,200,'+Math.min(.6,s.ct).toFixed(2)+')';ctx.fillRect(s.x,s.y-2,s.w,5)}}
   if(s.fall)drawFall(s,t);
   if(s.home)drawHome(s,t);
 }
@@ -553,6 +579,7 @@ function drawAnchor(a,t){
   ctx.strokeStyle=reach?'#ffe2a8':'#d4b06a';ctx.lineWidth=3.5;ctx.beginPath();ctx.arc(x,y,8,0,6.283);ctx.stroke();
 }
 function drawObstacle(o,t){
+  if(o.k==='geyser'){drawGeyser(o,t);return}
   if(o.k==='thorn'){const x=o.x,y=o.y,w=o.w;
     ctx.fillStyle='#2f5a2c';for(const[ox,oy,r]of[[.2,-8,10],[.5,-14,13],[.8,-8,10],[.35,-4,9],[.68,-4,9]]){ctx.beginPath();ctx.arc(x+w*ox,y+oy,r,0,6.283);ctx.fill()}
     ctx.strokeStyle='#d8e6c0';ctx.lineWidth=1.6;for(let i=0;i<9;i++){const a=-Math.PI*(i+.5)/9,cx=x+w*.5+Math.cos(a)*15,cy=y-9+Math.sin(a)*12;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*7,cy+Math.sin(a)*7);ctx.stroke()}
@@ -580,7 +607,41 @@ function drawObstacle(o,t){
   ctx.fillStyle='#ffc23f';ctx.beginPath();ctx.moveTo(20,-4);ctx.lineTo(27,-1);ctx.lineTo(20,1);ctx.fill();
   ctx.fillStyle='#1b1029';ctx.beginPath();ctx.arc(16,-4,1.6,0,6.283);ctx.fill();ctx.restore();
 }
-function drawTree(tr,t){
+let flashAt=-9,nextFlash=2,starCv=null;
+function drawLightning(t){
+  if(t>nextFlash){flashAt=t;nextFlash=t+2.4+Math.random()*3.6}
+  const f=Math.max(0,1-(t-flashAt)*3.2);if(f<=0)return;
+  ctx.fillStyle='rgba(225,230,255,'+(f*.32).toFixed(3)+')';ctx.fillRect(0,0,W,H);
+  if(f>.55){const sd=flashAt*10|0;let x=W*(.2+.6*hash(sd)),y=0;ctx.strokeStyle='rgba(245,247,255,'+f.toFixed(2)+')';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);
+    while(y<H*.7){y+=H*.07;x+=(hash(Math.floor(y)+sd*7)-.5)*H*.12;ctx.lineTo(x,y)}ctx.stroke()}
+}
+function drawGeyser(o,t){
+  const ph=(t+o.ph)%o.per,on=ph<o.dur,x=o.x,y=o.y;
+  ctx.fillStyle=map.rock[1];ctx.beginPath();ctx.ellipse(x,y+2,22,6,0,0,6.283);ctx.fill();
+  if(!on&&o.per-ph<.7){ctx.strokeStyle='rgba(255,230,200,.85)';ctx.lineWidth=2;const r=8+Math.sin(t*20)*2;ctx.beginPath();ctx.ellipse(x,y+1,r+8,r*.35,0,0,6.283);ctx.stroke()}
+  if(on){const h=Math.min(1,ph/o.dur*1.8);for(let i=0;i<9;i++){const yy=y-(i/9)*460*h,rr=12+i*2.6;ctx.fillStyle='rgba(255,255,255,'+(.5-i*.04).toFixed(2)+')';ctx.beginPath();ctx.ellipse(x+Math.sin(t*7+i*1.7)*(3+i),yy,rr,rr*.6,0,0,6.283);ctx.fill()}}
+}
+function drawBamboo(tr,t){
+  /* batched: one fill for every stalk and one for every leaf cluster, so a grove stays cheap to draw */
+  const x=tr.x,y=tr.y,sw=Math.sin(t*1.3+tr.k*9)*5;
+  ctx.fillStyle=map.tree;ctx.beginPath();
+  for(const[dx,hh,lean]of[[-7,tr.h*1.15,-1],[6,tr.h*.85,1]]){const bx=x+dx+sw*.5*lean;ctx.rect(bx-3.5,y-hh,7,hh)}
+  ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();
+  for(const[dx,hh]of[[-7,tr.h*1.15],[6,tr.h*.85]]){const bx=x+dx+sw*.5*(dx<0?-1:1);for(let j=y-hh+18;j<y;j+=26)ctx.rect(bx-3.5,j,7,2)}
+  ctx.fill();
+  ctx.fillStyle=map.tree2;ctx.beginPath();
+  for(const[dx,hh,lean]of[[-7,tr.h*1.15,-1],[6,tr.h*.85,1]]){const bx=x+dx+sw*.5*lean,top=y-hh;
+    for(const a of[-2.4,-1.6,-.6,.1,.9]){const lx=bx+Math.cos(a)*12,ly=top+4+Math.sin(a)*6;ctx.moveTo(lx+12,ly);ctx.ellipse(lx,ly,12,3.4,a,0,6.283)}}
+  ctx.fill();
+}
+function drawCactus(tr,t){
+  const x=tr.x,y=tr.y,h=tr.h*.55;ctx.fillStyle=map.tree;
+  pill(x-7,y-h,14,h,7);ctx.fill();
+  pill(x-20,y-h*.62,13,7,3.5);ctx.fill();pill(x-20,y-h*.62-h*.28,7,h*.28+7,3.5);ctx.fill();
+  pill(x+7,y-h*.45,13,7,3.5);ctx.fill();pill(x+13,y-h*.45-h*.22,7,h*.22+7,3.5);ctx.fill();
+}
+function drawTree(tr,t){if(map.bamboo){drawBamboo(tr,t);return}if(map.cactus){drawCactus(tr,t);return}
   const sw=Math.sin(t*1.2+tr.k*9)*3,h=tr.h,x=tr.x,y=tr.y;
   ctx.fillStyle='#4a3428';ctx.fillRect(x-3,y-h*.25,6,h*.25+2);
   for(let i=0;i<3;i++){const ty=y-h*.2-i*h*.24,w=h*(.34-i*.08);ctx.fillStyle=i%2?map.tree2:map.tree;ctx.beginPath();ctx.moveTo(x+sw*(i+1)*.5,ty-h*.36);ctx.lineTo(x+w,ty);ctx.lineTo(x-w,ty);ctx.closePath();ctx.fill()}
@@ -679,11 +740,11 @@ let countdown=0,toasts=[],curSeed=0;
 function toast(txt,col){const same=toasts.find(q=>q.txt===txt);if(same){same.t=3;return}toasts.push({txt,col:col||'#fff',t:3});if(toasts.length>3)toasts.shift()}
 const ghosts=new Map();
 function draw(){
-  const t=time;ctx.setTransform(DPR,0,0,DPR,0,0);drawSky(t);
+  const t=time;ctx.setTransform(DPR,0,0,DPR,0,0);drawSky(t);if(map.storm)drawLightning(t);
   const sh=shake>0?(Math.random()-.5)*shake*24:0,sv=shake>0?(Math.random()-.5)*shake*24:0;
   ctx.setTransform(DPR*S,0,0,DPR*S,(-cam.x*S+sh)*DPR,(-cam.y*S+sv)*DPR);
   const vx0=cam.x-80,vx1=cam.x+W/S+80;
-  for(const s of solids)if(s.type!=='arch'&&s.x+s.w>vx0-40&&s.x<vx1+40)drawSolid(s,t);
+  for(const s of solids)if(!s.gone&&s.type!=='arch'&&s.x+s.w>vx0-40&&s.x<vx1+40)drawSolid(s,t);
   for(const tr of trees)if(tr.x>vx0-60&&tr.x<vx1+60)drawTree(tr,t);
   for(const s of solids)if(s.type==='arch'&&s.x+s.w>vx0&&s.x<vx1)drawSolid(s,t);
   for(const a of anchors)if(a.x>vx0-60&&a.x<vx1+60)drawAnchor(a,t);
@@ -779,7 +840,7 @@ function showOver(){
   else ov.innerHTML=`<div class="card solo"><div class="lead"><p class="stat">${map.name} · ${levelT.toFixed(1)}s · ${shards_got} cheese</p><p class="big">Safe!</p>
     <p class="tag">You made it to the safe hole. Best time here: ${best[mapIdx].time}s.</p><div class="row"><button class="btn" data-act="next">Run ${nxt.name}</button><button class="btn ghost" data-act="menu">Menu</button></div></div></div>`;
 }
-function play(i,seed){audio();startMap(i,seed);ov.hidden=true;ov.innerHTML='';state='play';countdown=0}
+function play(i,seed){audio();startMap(i,seed);ov.hidden=true;ov.innerHTML='';state='play';countdown=0;if(map.tip)toast(map.tip,'#ffd58a')}
 onPause=()=>{if(state==='play'&&countdown<=0){state='pause';clearInput();showPause()}};
 isPlaying=()=>state==='play';
 ov.addEventListener('click',e=>{
@@ -795,9 +856,11 @@ ov.addEventListener('click',e=>{
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play'&&!NET.active)onPause()});
 
 /* ---------- loop ---------- */
-let lastT=performance.now();
+let lastT=performance.now(),slow=.016,slowN=0;
 function frame(now){
   const dt=Math.min(.05,(now-lastT)/1000)||0;lastT=now;
+  /* keep it smooth: if frames stay slow, draw at a lower resolution (2 -> 1.5 -> 1). It never goes back up, so it can't flip-flop */
+  if(state==='play'&&dt>0){slow=slow*.97+dt*.03;if(++slowN>150&&slow>.0235&&DPRMAX>1){DPRMAX=DPRMAX>1.5?1.5:1;slowN=0;slow=.016;resize()}}
   try{
     if(state==='play'){
       if(countdown>0){countdown-=dt;time+=dt;if(countdown<=0)sfx.jump()}
@@ -1145,7 +1208,7 @@ function mpWon(){
 }
 
 resize();startMap(0);showMenu();checkInvite();requestAnimationFrame(frame);
-if(/[?&]debug/.test(location.search))window.__nm={P,get cat(){return cat},get state(){return state},get obst(){return obst},get solids(){return solids}};
+if(/[?&]debug/.test(location.search))window.__nm={P,get cat(){return cat},get state(){return state},get obst(){return obst},get solids(){return solids},get dpr(){return DPR},draw,play:(i)=>play(i,7)};
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(_){}
 })();
 </script>
