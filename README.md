@@ -18,6 +18,14 @@ When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`)
 - **Bamboo Wind Valley:** misty bamboo groves where gusts push you around in the air
 - **Stormfall Peaks:** a night storm with lightning, fast rivers and ledges that crumble if you stand still
 - **Geyser Mesa:** sunset desert mesas, cacti and geysers that blast you skyward when they erupt
+- **Sakura Hills:** pink blossom trees, drifting petals, birds and soft breezes
+- **Mystic Marsh:** a glowing night swamp with fireflies, mist and giant mushroom springs
+- **Ember Caldera:** volcanic ridges, lava rivers and falls, rising embers and lava geysers
+- **Sky Islands:** floating islands, a rainbow and a sea of clouds, packed with boosts
+- **Palm Cove:** tropical shore, swaying palms, gulls and a strong sea breeze
+- **Neon Rooftops:** a lit-up city at night with neon signs and steam vents
+- **Cloud Kingdom:** walk on puffy clouds in a pastel sunset sky, with winds and lots of boosts
+- **Crystal Caverns:** glowing crystal caves with stalactites, crumbling ledges and an underground river
 
 Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
 
@@ -26,6 +34,12 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 - **Fallen logs** at head height: roll under or jump over
 - **Rolling boulders** that tumble along the rocks and off the edge
 - **Hawks** patrolling the sky between rocks, right where you fly
+
+## Boosts
+- **Orbs** floating in the gaps: **TURBO** (3 s of speed), **LIFT** (shoots you into the sky and refills jumps and dash), **SHIELD** (blocks the next hit), **FREEZE** (stops the cat for about 3 s)
+- **Yellow speed pads** on rock edges give a burst of speed; **pink mushroom springs** bounce you high
+
+The cat is fully rigged: it gallops, leaps the gaps in an arc and scrambles up cliff faces. If you get hit or splash into the river it surges forward, so protect yourself.
 
 ## Journey challenges
 - **Wind (Bamboo Wind Valley):** gusts shove you sideways while you're in the air, then ease off. Steer against them or dash through. Grounded and you're safe.
@@ -41,7 +55,8 @@ The game keeps itself smooth: if frames stay slow it quietly lowers the drawing 
 |---|---|---|
 | Drag your left thumb on the left side | A D / ← → | Move |
 | JUMP | Space / W / ↑ | Jump. Tap again in the air to double jump, or jump off a cliff wall |
-| Hold JUMP while falling | Hold Space | Glide |
+| Hold JUMP while falling, or tap JUMP during a long fall | Hold Space | Hang glide: a leaf unfolds on your back. Let go and it folds away the same way |
+| Push into a wall, or just under its edge | Same | Cling to the cliff, or hang on the ledge. JUMP climbs up; push away + JUMP kicks off like a ninja |
 | Tap a cloud ring, lantern or rock (right side) | Click | Grapple. Hold and the rope pulls you up to it, then launches you into the sky. Let go anytime to fly free |
 | Hold left thumb down while hooked | Hold ↓ | Swing on the rope instead of being pulled |
 | DASH | Shift / J / K | Dash, aimed with your left thumb or the arrow keys. You pass through hazards while dashing |
