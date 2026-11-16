@@ -126,7 +126,13 @@ const MAPS=[
 {name:'Cloud Kingdom',blurb:'Walk on puffy clouds high above the world',tip:'Soft clouds, strong winds and lots of boosts. Glide the gaps',finish:23000,cat:220,gap:[110,255],w:[140,300],dy:130,top:[280,500],ground:'rock',fall:0,treeP:.35,wind:.6,tk:'blossom',noPines:true,cloud:true,rainbow:true,birds:true,rays:true,amb:['sparkle',26],boostP:.62,padP:.45,springP:.55,
  sky:['#ff9ec4','#ffd0a8','#fff4d6'],sun:'#fffbe0',moon:false,far:['#ffd9ec','#f3bfe0','#d9a6dc'],snow:'#ffffff',fog:'#ffe6f2',rock:['#ffffff','#cdb8f2'],cap:'#ffffff',tree:'#ffa6d8',tree2:'#ffd3ee',water:['#ffeaf8','#c9a8f0'],rim:'#ffffff',flow:15,rain:false},
 {name:'Crystal Caverns',blurb:'Glowing crystal caves, hanging stalactites and an underground river',tip:'Crystal ledges crumble. Keep moving and use the glow',finish:24000,cat:245,gap:[115,240],w:[110,240],dy:130,top:[290,520],ground:'rock',fall:.18,treeP:.9,hazard:'crumble',tk:'crystal',noPines:true,cave:true,amb:['sparkle',40],boostP:.42,springP:.4,
- sky:['#07031a','#160c38','#2b175c'],sun:'#8fe9ff',moon:false,far:['#2b1b58','#1e1243','#130a2d'],snow:'#8fe9ff',fog:'#4b2b9c',rock:['#3b3068','#17112f'],cap:'#6ff0ff',tree:'#7a5cff',tree2:'#ff6fe0',water:['#3ad8ff','#0c2a6a'],rim:'#c4f7ff',flow:30,rain:false}
+ sky:['#07031a','#160c38','#2b175c'],sun:'#8fe9ff',moon:false,far:['#2b1b58','#1e1243','#130a2d'],snow:'#8fe9ff',fog:'#4b2b9c',rock:['#3b3068','#17112f'],cap:'#6ff0ff',tree:'#7a5cff',tree2:'#ff6fe0',water:['#3ad8ff','#0c2a6a'],rim:'#c4f7ff',flow:30,rain:false},
+{name:'Sunset Clouds',blurb:'Golden cloud islands drifting through a blazing sunset',tip:'Strong crosswinds. Walk the clouds, glide the gaps',finish:24000,cat:235,gap:[130,290],w:[130,260],dy:150,top:[260,500],ground:'rock',fall:0,treeP:.3,wind:.75,tk:'blossom',noPines:true,cloud:true,birds:true,rays:true,amb:['sparkle',28],boostP:.5,padP:.4,springP:.5,
+ sky:['#ff6a4a','#ffa564','#ffe3a0'],sun:'#fff4cc',moon:false,far:['#ffb48a','#f08a8a','#c46a9a'],snow:'#fff4e0',fog:'#ffd2b0',rock:['#fff3e6','#f1b3a0'],cap:'#ffffff',tree:'#ff9a6a',tree2:'#ffd0a0',water:['#ffd9b0','#e8909a'],rim:'#fff',flow:15,rain:false},
+{name:'Moonlit Cloud Sea',blurb:'Silver clouds under a huge moon and a sky full of stars',tip:'Silver clouds crumble if you stand still. Keep moving',finish:25000,cat:250,gap:[130,290],w:[120,250],dy:150,top:[260,500],ground:'rock',fall:0,treeP:.35,hazard:'crumble',wind:.5,tk:'blossom',noPines:true,cloud:true,rays:true,amb:['sparkle',46],boostP:.5,springP:.5,padP:.4,
+ sky:['#090e3c','#27308a','#7a6cc8'],sun:'#eef2ff',moon:true,far:['#3a3f8c','#2b2f78','#1d2060'],snow:'#d6dcff',fog:'#5a62b8',rock:['#d9dfff','#6a72c8'],cap:'#f2f5ff',tree:'#8f9dff',tree2:'#d6dcff',water:['#8d9bff','#262c78'],rim:'#e8ecff',flow:15,rain:false},
+{name:'Thunder Clouds',blurb:'A raging storm above the world. Lightning, rain and wild winds',tip:'The hardest journey. Crumbling clouds and fierce wind',finish:26000,cat:272,gap:[140,300],w:[110,230],dy:160,top:[260,500],ground:'rock',fall:0,treeP:.1,hazard:'crumble',wind:.9,storm:true,rain:true,tk:'blossom',noPines:true,cloud:true,boostP:.55,springP:.5,padP:.4,
+ sky:['#12162b','#2b3354','#5b6591'],sun:'#9aa8d8',moon:false,far:['#2f3558','#232846','#181c34'],snow:'#9aa8d8',fog:'#3f4770',rock:['#a4acd0','#464e7e'],cap:'#cdd5f2',tree:'#5b6591',tree2:'#8b95c2',water:['#6a76b0','#1c2244'],rim:'#cdd5f2',flow:20}
 ];
 
 let best={};try{best=JSON.parse(localStorage.getItem('skyswing-best')||'{}')||{}}catch(_){best={}}
@@ -146,12 +152,12 @@ function genUntil(lim){
   while(genX<lim&&!genDone){
     const M=map,ramp=clamp(genX/M.finish,0,1);
     if(genX>=M.finish){const s=addChunk(genX+140,lastTop,1500,M.ground,{home:true});homeX=s.x+520;genDone=true;break}
-    const gap=lerp(M.gap[0],M.gap[1],rng()*(.4+.6*ramp)),w=lerp(M.w[0],M.w[1],rng());
-    const top=clamp(lastTop+(rng()*2-1)*M.dy,M.top[0],M.top[1]),gx=genX+gap;
+    const gap=lerp(M.gap[0],M.gap[1],rng()*(.4+.6*ramp))*(1.08+.14*ramp),w=lerp(M.w[0],M.w[1],rng())*1.55;
+    const top=clamp(lastTop+(rng()*2-1)*M.dy*1.2,M.top[0],M.top[1]),gx=genX+gap;
     const hi=Math.min(lastTop,top);
     if(gap>150&&rng()<.88){const aw=clamp(gap*.55,90,190);addChunk(genX+gap*.2,clamp(hi-lerp(170,235,rng()),40,400),aw,'arch',{h:30})}
     {const na=gap>170?2:1;for(let i=0;i<na;i++){const ax=genX+gap*(i+1)/(na+1)+(rng()-.5)*50;anchors.push({x:ax,y:clamp(hi-lerp(240,340,rng()),-140,330),k:rng()<.55?'cloud':'lantern',p:rng()*6})}}
-    if(rng()<.22+.4*ramp)obst.push({k:'hawk',x:genX+gap*.5,y:clamp(hi-lerp(150,330,rng()),-170,330),r:lerp(120,260,rng()),p:rng()*6});
+    if(genX>1800&&rng()<.06+.15*ramp)obst.push({k:'hawk',x:genX+gap*.5,y:clamp(hi-lerp(150,330,rng()),-170,330),r:lerp(120,260,rng()),p:rng()*6});
     if(gap>110){const n=2+(rng()*3|0);for(let i=0;i<n;i++){const t=(i+1)/(n+1);shards.push({x:genX+gap*t,y:hi-70-Math.sin(t*Math.PI)*60-rng()*30,got:false,p:rng()*6})}}
     const s=addChunk(gx,top,w,M.ground);
     if(gap>140&&rng()<(M.boostP==null?.3:M.boostP)){const r=rng(),k=r<.34?'turbo':r<.6?'lift':r<.82?'shield':'freeze';boosts.push({k,x:genX+gap*.5,y:hi-95-rng()*70,p:rng()*6})}
@@ -159,11 +165,12 @@ function genUntil(lim){
     if(w>200&&rng()<(M.padP==null?.35:M.padP)){const px=gx+w-44,sp=rng()<(M.springP==null?.4:M.springP);boosts.push({k:sp?'spring':'pad',x:px,y:top,p:rng()*6});padUsed.push([px-34,px+34])}
     if(M.hazard==='crumble'&&w<300&&rng()<.6)s.crumble=true;
     if(M.hazard==='geyser'&&w>150&&rng()<.7)obst.push({k:'geyser',x:gx+w*(.3+rng()*.4),y:top,per:2.8+rng()*1.2,ph:rng()*4,dur:1.1,en:-1});
-    {const dens=.28+.4*ramp,used=padUsed;
-     const pick=ww=>{for(let k=0;k<4;k++){const ox=gx+45+rng()*Math.max(1,w-90-ww);if(!used.some(u=>ox<u[1]+30&&ox+ww>u[0]-30)){used.push([ox,ox+ww]);return ox}}return null};
-     if(w>140&&rng()<dens){const ox=pick(34);if(ox!=null)obst.push({k:'thorn',x:ox,y:top,w:34})}
-     if(w>190&&rng()<dens*.85){const ox=pick(74);if(ox!=null)obst.push({k:'log',x:ox,y:top,w:74})}
-     if(w>220&&rng()<dens*.6)obst.push({k:'boulder',x:gx,x0:gx,x1:gx+w,y:top,p:rng(),sp:110+rng()*90});}
+    {const dens=.1+.2*ramp,used=padUsed; /* roomy ledges, and at most one ground hazard on each so you can run */
+     const pick=ww=>{for(let k=0;k<4;k++){const ox=gx+60+rng()*Math.max(1,w-120-ww);if(!used.some(u=>ox<u[1]+40&&ox+ww>u[0]-40)){used.push([ox,ox+ww]);return ox}}return null};
+     if(genX>2200&&w>220&&rng()<dens){const r=rng();
+       if(r<.5){const ox=pick(34);if(ox!=null)obst.push({k:'thorn',x:ox,y:top,w:34})}
+       else if(r<.8&&w>260){const ox=pick(74);if(ox!=null)obst.push({k:'log',x:ox,y:top,w:74})}
+       else if(w>320)obst.push({k:'boulder',x:gx,x0:gx,x1:gx+w,y:top,p:rng(),sp:110+rng()*90})}}
     if(w>190&&rng()<.6)anchors.push({x:gx+w*(.3+rng()*.4),y:clamp(top-lerp(270,360,rng()),-140,300),k:rng()<.5?'cloud':'lantern',p:rng()*6});
     if(w>150&&rng()<M.fall)s.fall={side:rng()<.6?1:-1,w:14+rng()*12,flow:rng()};
     if(rng()<M.treeP){const n=Math.max(1,Math.floor(w/110*rng()+.5));for(let i=0;i<n;i++)trees.push({x:gx+24+rng()*(w-48),y:top,h:lerp(90,210,rng()),k:rng()})}
@@ -490,7 +497,7 @@ function update(dt){
   for(const s of shards){if(!s.got&&Math.abs(s.x-p.x)<32&&Math.abs(s.y-(p.y-22))<34){s.got=true;shards_got++;sfx.gem();burst(s.x,s.y,10,'#ffe27a',200,.5,0)}}
   /* cat */
   cat.t+=dt;const gap=p.x-cat.x;
-  cat.speed=map.cat+Math.min(levelT*1.6,90);
+  cat.speed=map.cat*1.07+Math.min(levelT*1.6,90);
   cat.boost=Math.max(0,(cat.boost||0)-dt);
   if(cat.freeze>0){cat.freeze-=dt;if(Math.random()<.4)parts.push({x:cat.x+(Math.random()-.5)*50,y:cat.y-20-Math.random()*30,vx:0,vy:-20,l:.5,m:.5,c:'#d8f6ff',g:0,r:2})}
   else if(levelT>1.6)catMove(dt,(gap>1000?1.35:1)*(cat.boost>0?1.75:1));
@@ -921,7 +928,8 @@ function drawCloudSolid(s,t){
   const g=ctx.createLinearGradient(0,y-10,0,y+hh);g.addColorStop(0,M.rock[0]);g.addColorStop(.5,M.rock[1]);g.addColorStop(1,M.rock[1]+'00');ctx.fillStyle=g;
   ctx.beginPath();ctx.rect(x,y+4,w,hh);for(let i=0;i<=n;i++){const cx=x+w*i/n,r=20+s.r[i%8]*12;ctx.moveTo(cx+r,y+6);ctx.arc(cx,y+6,r,0,6.283)}
   for(let i=0;i<n;i++){const cx=x+w*(i+.5)/n,r=26+s.r[(i+2)%8]*16;ctx.moveTo(cx+r,y+hh*.55);ctx.arc(cx,y+hh*.55,r,0,6.283)}ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.moveTo(x+4,y+10);for(let i=0;i<=n;i++){const cx=x+w*i/n,r=14+s.r[i%8]*8;ctx.moveTo(cx+r,y-1);ctx.arc(cx,y-1,r,Math.PI,0)}ctx.rect(x+2,y-2,w-4,10);ctx.fill();
+  ctx.fillStyle=M.cap;ctx.globalAlpha=.95;ctx.beginPath();ctx.moveTo(x+4,y+10);for(let i=0;i<=n;i++){const cx=x+w*i/n,r=14+s.r[i%8]*8;ctx.moveTo(cx+r,y-1);ctx.arc(cx,y-1,r,Math.PI,0)}ctx.rect(x+2,y-2,w-4,10);ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();for(let i=0;i<n;i++){const cx=x+w*(i+.5)/n,yy=y+30+s.r[(i+3)%8]*70;ctx.moveTo(cx-18,yy);ctx.quadraticCurveTo(cx,yy-8,cx+18,yy)}ctx.stroke();
 }
 function crystalTree(tr,t){
   const x=tr.x,y=tr.y,h=tr.h*.55,cols=[map.tree,map.tree2,map.cap];

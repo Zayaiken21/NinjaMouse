@@ -25,6 +25,7 @@ When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`)
 - **Palm Cove:** tropical shore, swaying palms, gulls and a strong sea breeze
 - **Neon Rooftops:** a lit-up city at night with neon signs and steam vents
 - **Cloud Kingdom:** walk on puffy clouds in a pastel sunset sky, with winds and lots of boosts
+- **Sunset Clouds, Moonlit Cloud Sea and Thunder Clouds:** more cloud floors, from a golden sunset to a lightning storm that is the hardest journey
 - **Crystal Caverns:** glowing crystal caves with stalactites, crumbling ledges and an underground river
 
 Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
@@ -40,6 +41,9 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 - **Yellow speed pads** on rock edges give a burst of speed; **pink mushroom springs** bounce you high
 
 The cat is fully rigged: it gallops, leaps the gaps in an arc and scrambles up cliff faces. If you get hit or splash into the river it surges forward, so protect yourself.
+
+## Difficulty
+Ledges are about 50% wider so there is room to run, and ground hazards are rare (at most one per ledge, none at the very start). The challenge comes from longer gaps, bigger height changes, wind, crumbling clouds and a faster cat instead.
 
 ## Journey challenges
 - **Wind (Bamboo Wind Valley):** gusts shove you sideways while you're in the air, then ease off. Steer against them or dash through. Grounded and you're safe.
