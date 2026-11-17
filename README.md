@@ -42,6 +42,14 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 
 The cat is fully rigged: it gallops, leaps the gaps in an arc and scrambles up cliff faces. If you get hit or splash into the river it surges forward, so protect yourself.
 
+## Cheese upgrades
+Every cheese you grab goes into a bank that is saved on your phone (plus 8 bonus cheese for reaching the safe hole). Open **Upgrades** on the menu to spend it:
+- **Backflip** (double jump becomes a spinning flip, higher) and **Sky flip** (one more flip jump in the air)
+- **Strong Grip** (longer reach, faster reel), **Big Leaf** (slower sink, faster glide), **Quick Dash** (faster recharge, then two dashes)
+- **Cheese Magnet**, **Ninja Kick** (stronger wall and ledge kick-offs), **Lucky Start** (begin with a shield) and **Boost Master** (longer boosts)
+
+The grapple pull is gentler and more realistic now: it reels you in and lets go with a modest pop instead of flinging you across the map.
+
 ## Difficulty
 Ledges are about 50% wider so there is room to run, and ground hazards are rare (at most one per ledge, none at the very start). The challenge comes from longer gaps, bigger height changes, wind, crumbling clouds and a faster cat instead.
 

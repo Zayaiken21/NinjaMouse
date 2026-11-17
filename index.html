@@ -41,6 +41,7 @@ h1 em{color:var(--acc);font-style:inherit}
 .keys{flex:1.1 1 0;min-width:0;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(6px,2.2vh,12px)}
 .keys li{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:baseline;padding:clamp(6px,2vh,10px) 12px;background:var(--panel);border-radius:10px;font-size:clamp(11px,3.1vh,14px);line-height:1.35;color:var(--mut)}
 .keys b{font:700 clamp(11px,3vh,13px) "Chakra Petch",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--fg)}
+.card.shopc{max-width:900px;flex-direction:column;align-items:stretch;gap:8px;margin:auto}.shopc .lead{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;flex:none}.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:10px}.up{background:rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:6px}.up p{margin:0;font-size:12.5px;opacity:.85;flex:1}.up .btn{padding:8px 12px;font-size:13px}.pips{color:var(--acc);letter-spacing:2px;font-size:12px}
 .maps{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;margin:2px 0 4px;padding:3px 2px 6px;scrollbar-width:thin}
 .mp{appearance:none;cursor:pointer;border:0;border-radius:10px;padding:8px 12px;background:var(--panel);color:var(--mut);text-align:left;font:500 clamp(11px,3vh,13px)/1.25 Sora,system-ui,sans-serif;box-shadow:inset 0 0 0 2px var(--line);min-width:0;flex:0 0 clamp(124px,23vw,158px);scroll-snap-align:start;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.65)}
 .mp b{display:block;font:700 clamp(12px,3.3vh,15px) "Chakra Petch",system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#fff}
@@ -136,6 +137,20 @@ const MAPS=[
 ];
 
 let best={};try{best=JSON.parse(localStorage.getItem('skyswing-best')||'{}')||{}}catch(_){best={}}
+/* cheese bank and permanent upgrades */
+let bank=0,UP={flip:0,grip:0,leaf:0,dash:0,magnet:0,kick:0,start:0,boost:0};
+try{bank=+localStorage.getItem('nm-bank')||0;Object.assign(UP,JSON.parse(localStorage.getItem('nm-up')||'{}'))}catch(_){}
+function saveBank(){try{localStorage.setItem('nm-bank',bank);localStorage.setItem('nm-up',JSON.stringify(UP))}catch(_){}}
+const UPG={
+ flip:{n:'Backflip',max:2,cost:[25,70],d:['Your double jump becomes a spinning backflip, higher','Sky flip: one extra flip jump in the air']},
+ grip:{n:'Strong Grip',max:3,cost:[20,45,80],d:['Grapple reaches farther and reels faster','Even longer reach and stronger pull','Master grip: the longest reach']},
+ leaf:{n:'Big Leaf',max:3,cost:[20,45,80],d:['Leaf sinks slower and glides faster','Floatier glide, more speed','Master glider']},
+ dash:{n:'Quick Dash',max:3,cost:[20,45,90],d:['Dash recharges faster','Even faster recharge','Two dashes before you land']},
+ magnet:{n:'Cheese Magnet',max:3,cost:[15,35,60],d:['Collect cheese from farther away','Bigger pickup reach','Huge pickup reach']},
+ kick:{n:'Ninja Kick',max:2,cost:[25,60],d:['Stronger kick-offs from walls and ledges','Master kick: launch even higher']},
+ start:{n:'Lucky Start',max:1,cost:[40],d:['Begin every run with a shield']},
+ boost:{n:'Boost Master',max:3,cost:[25,55,90],d:['Boosts last 30% longer','Boosts last 60% longer','Boosts last 90% longer']}
+};
 function saveBest(){try{localStorage.setItem('skyswing-best',JSON.stringify(best))}catch(_){}}
 
 /* ---------- audio (tiny synth, starts after first tap) ---------- */
@@ -255,7 +270,7 @@ let boosts=[];
 const BOOST={turbo:{c:'#ffd84a',n:'TURBO'},lift:{c:'#8fe8ff',n:'LIFT'},shield:{c:'#9ab8ff',n:'SHIELD'},freeze:{c:'#c8f4ff',n:'FREEZE'}};
 const cat={x:-260,y:480,speed:200,t:0,roarT:0};
 let state='menu',cam={x:0,y:0},time=0,levelT=0,shards_got=0,parts=[],shake=0,hintT=0,winX=0,ended=null;
-const RANGE=600;
+let RANGE=600;const maxDash=()=>UP.dash>=3?2:1,bm=()=>1+.3*UP.boost;
 
 function startMap(i,seed){
   mapIdx=((i%MAPS.length)+MAPS.length)%MAPS.length;map=MAPS[mapIdx];
@@ -263,6 +278,7 @@ function startMap(i,seed){
   addChunk(-300,480,820,map.ground);genX=520;lastTop=480;genUntil(2600);
   Object.assign(P,{x:140,y:480,vx:0,vy:0,face:1,ground:true,coyote:0,jumps:2,dashes:1,dashT:0,dashCd:0,rollT:0,rollCd:0,gliding:false,hook:null,wall:0,inv:1,safe:{x:140,y:480},trail:[],land:0,leaf:0,turbo:0,shield:false,hang:null,cling:false,kickT:0,grabCd:0,wallS:null,flip:0});
   Object.assign(cat,{x:-300,y:480,speed:map.cat,t:0,roarT:3,freeze:0,mode:'run',vy:0,ph:0,boost:0,lvx:0});
+  RANGE=600+70*UP.grip;P.shield=UP.start>0;P.triUsed=false;P.tumT=0;
   parts=[];shake=0;flashAt=-9;nextFlash=2;levelT=0;shards_got=0;hintT=7;time=0;ended=null;winX=0;
   cam.x=P.x-W/S*.3;cam.y=P.y-300;clearInput();
 }
@@ -300,8 +316,8 @@ function updateHook(dt,ax,ay){
     h.x=hx;h.y=hy;if(h.ref){const q=apos(h.ref);h.tx=q[0];h.ty=q[1]}
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
     const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=4400*dt;
-    if(dd<=st){h.mode='on';const L=Math.hypot(h.tx-hx,h.ty-hy)||1;h.len=clamp(L,40,RANGE);h.minT=time+.32;P.dashes=1;P.ground=false;
-      P.vx+=(h.tx-hx)/L*400;P.vy+=(h.ty-hy)/L*400;   // a tug the moment it bites
+    if(dd<=st){h.mode='on';const L=Math.hypot(h.tx-hx,h.ty-hy)||1;h.len=clamp(L,40,RANGE);h.minT=time+.32;P.dashes=maxDash();P.ground=false;
+      P.vx+=(h.tx-hx)/L*260;P.vy+=(h.ty-hy)/L*260;   // a tug the moment it bites
       sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
     else{h.tipx+=dx/dd*st;h.tipy+=dy/dd*st}
     return;
@@ -312,7 +328,7 @@ function updateHook(dt,ax,ay){
   h.pull=!(ay>.4);
   if(h.pull){
     /* reel in: the rope hauls you toward what you hooked, up into the sky or onto the rock, and keeps your sideways speed so you curve */
-    P.vx+=ux*5400*dt;P.vy+=uy*5400*dt;P.vy+=700*dt;
+    const gr=1+.12*UP.grip;P.vx+=ux*3600*gr*dt;P.vy+=uy*3600*gr*dt;P.vy+=700*dt;
     h.len=Math.max(30,Math.min(h.len,d+1));
     if(ax){const push=ax*900*dt;P.vx+=tx*push;P.vy+=ty*push}
     if(d<58){zipOff(h,ux,uy);return}
@@ -322,13 +338,13 @@ function updateHook(dt,ax,ay){
     if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
   }
   P.vx*=1-.04*dt;P.vy*=1-.04*dt;
-  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?1600:1150;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
+  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?1050*(1+.06*UP.grip):1000;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
 }
 /* reaching the hook: let go and keep flying with all your speed, plus a pop so you clear the ledge or rise past the lantern */
 function zipOff(h,ux,uy){
-  P.hook=null;P.jumps=Math.max(P.jumps,1);P.dashes=1;P.cut=false;P.float=.5;
-  const sp=Math.hypot(P.vx,P.vy);if(sp<680){const k=680/(sp||1);P.vx*=k;P.vy*=k}
-  P.vy=Math.min(P.vy,0)-(uy<-.3?300:180);
+  P.hook=null;P.jumps=Math.max(P.jumps,1);P.dashes=maxDash();P.cut=false;P.float=.5;
+  const sp=Math.hypot(P.vx,P.vy);if(sp<440){const k=440/(sp||1);P.vx*=k;P.vy*=k}else if(sp>800){const k=800/sp;P.vx*=k;P.vy*=k}
+  P.vy=Math.min(P.vy,0)-(uy<-.3?170:90);
   sfx.air();burst(h.tx,h.ty,10,'#fff2c4',200,.4,150);
 }
 /* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
@@ -382,7 +398,7 @@ function won(){
   if(state!=='play')return;
   if(NET.active){mpWon();return}state='over';ended='won';sfx.win();
   const b=best[mapIdx]||{};const t=Math.round(levelT*10)/10;
-  b.time=b.time?Math.min(b.time,t):t;b.shards=Math.max(b.shards||0,shards_got);best[mapIdx]=b;saveBest();showOver();
+  bank+=8;saveBank();b.time=b.time?Math.min(b.time,t):t;b.shards=Math.max(b.shards||0,shards_got);best[mapIdx]=b;saveBest();showOver();
 }
 
 function update(dt){
@@ -393,23 +409,23 @@ function update(dt){
   const jh=inp.jumpTouch>0||kHeld('Space','ArrowUp','KeyW');
   inp.jumpBuf-=dt;inp.dashBuf-=dt;p.dashCd-=dt;p.inv-=dt;p.land-=dt;p.float=(p.float||0)-dt;
   if(ax>.2)p.face=1;else if(ax<-.2)p.face=-1;
-  if(p.ground){p.coyote=.1;p.jumps=2;if(p.dashT<=0)p.dashes=1}else{p.coyote-=dt;if(p.coyote<=0&&p.jumps>1)p.jumps=1}
+  if(p.ground){p.coyote=.1;p.jumps=2;p.triUsed=false;if(p.dashT<=0)p.dashes=maxDash()}else{p.coyote-=dt;if(p.coyote<=0&&p.jumps>1)p.jumps=1}
 
   /* jump: ground, double jump, wall jump, off the rope */
-  p.grabCd-=dt;p.kickT-=dt;p.turbo-=dt;if(p.kickT>0)p.flip+=dt*16;
+  p.grabCd-=dt;p.kickT-=dt;p.turbo-=dt;p.tumT=(p.tumT||0)-dt;if(p.kickT>0||p.tumT>0)p.flip+=dt*16;
   if(inp.jumpBuf>0){
     if(p.hang){const s=p.hang,w=p.hangSide;p.hang=null;inp.jumpBuf=0;
-      if(ax*w<-.3){p.vx=-w*500;p.vy=-700;p.face=-w;p.kickT=.42;p.grabCd=.3;p.cut=true;p.jumps=2;p.dashes=1;sfx.jump();shake=Math.max(shake,.1);burst(p.x+w*8,p.y-24,9,'#ffffff',150,.35,300);hintT=0}
+      if(ax*w<-.3){p.vx=-w*(500+60*UP.kick);p.vy=-700-40*UP.kick;p.face=-w;p.kickT=.42;p.grabCd=.3;p.cut=true;p.jumps=2;p.dashes=maxDash();sfx.jump();shake=Math.max(shake,.1);burst(p.x+w*8,p.y-24,9,'#ffffff',150,.35,300);hintT=0}
       else{p.x=clamp(p.x+w*14,s.x+6,s.x+s.w-6);p.y=s.y-1;p.vy=-260;p.vx=w*140;p.jumps=2;p.grabCd=.2;sfx.land();burst(p.x,s.y,6,'#e8dccb',100,.35,300)}}
     else if(p.hook&&p.hook.mode==='on'){const h=p.hook;P.hook=null;p.jumps=Math.max(p.jumps,1);p.vy=Math.min(p.vy,0)-300;p.vx*=1.05;p.cut=false;inp.jumpBuf=0;sfx.air();burst(p.x,p.y-20,6,'#ffffff',120,.35,100)}
     else if(p.ground||p.coyote>0){p.vy=-640;p.cut=true;p.rollT=0;p.ground=false;p.coyote=0;p.jumps=1;inp.jumpBuf=0;sfx.jump();burst(p.x,p.y,6,'#e8dccb',100,.35,300)}
-    else if(p.wall!==0){p.vx=-p.wall*430;p.vy=-640;p.cut=true;p.face=-p.wall;p.jumps=Math.max(p.jumps,1);p.dashes=1;p.kickT=.4;p.grabCd=.25;inp.jumpBuf=0;sfx.jump();burst(p.x+p.wall*8,p.y-20,6,'#ffffff',100,.3,300)}
+    else if(p.wall!==0){p.vx=-p.wall*(430+50*UP.kick);p.vy=-640-35*UP.kick;p.cut=true;p.face=-p.wall;p.jumps=Math.max(p.jumps,1);p.dashes=maxDash();p.kickT=.4;p.grabCd=.25;inp.jumpBuf=0;sfx.jump();burst(p.x+p.wall*8,p.y-20,6,'#ffffff',100,.3,300)}
     else if(p.vy>400&&!p.hook){p.vy*=.45;p.gliding=true;p.leafKick=1;inp.jumpBuf=0;sfx.air();for(let i=0;i<8;i++)parts.push({x:p.x,y:p.y-40,vx:(Math.random()-.5)*160,vy:-30-Math.random()*60,l:.5,m:.5,c:'#9be26a',g:60,r:2.4})}
-    else if(p.jumps>0){p.vy=-590;p.cut=true;p.jumps--;inp.jumpBuf=0;sfx.air();for(let i=0;i<10;i++)parts.push({x:p.x,y:p.y-4,vx:Math.cos(i*.628)*130,vy:Math.sin(i*.628)*50,l:.35,m:.35,c:'#bfefff',g:0,r:2.4})}
+    else if(p.jumps>0){p.vy=-590-(UP.flip>0?70:0);p.cut=true;p.jumps--;inp.jumpBuf=0;sfx.air();if(UP.flip>0){p.tumT=.44;p.flip=0;if(UP.flip>1&&!p.triUsed){p.triUsed=true;p.jumps++}}for(let i=0;i<10;i++)parts.push({x:p.x,y:p.y-4,vx:Math.cos(i*.628)*130,vy:Math.sin(i*.628)*50,l:.35,m:.35,c:'#bfefff',g:0,r:2.4})}
   }
   /* dash */
   if(inp.dashBuf>0&&p.dashCd<=0&&p.dashes>0){
-    inp.dashBuf=0;p.dashes--;p.dashCd=.32;p.dashT=.17;const d=Math.hypot(ax,ay);
+    inp.dashBuf=0;p.dashes--;p.dashCd=.32-.06*UP.dash;p.dashT=.17;const d=Math.hypot(ax,ay);
     if(d>.35){p.dx=ax/d;p.dy=ay/d}else{p.dx=p.face;p.dy=0}
     if(Math.abs(p.dx)>.2)p.face=p.dx>0?1:-1;
     if(p.hook)dropHook(false);p.hang=null;p.grabCd=.2;sfx.dash();shake=Math.max(shake,.12);buzz(15);
@@ -434,8 +450,8 @@ function update(dt){
     if(p.hang){p.vx=0;p.vy=0;p.gliding=false}
     else if(!hooked){
       if(p.gliding){
-        const spd=Math.abs(p.vx);p.vy=lerp(p.vy,spd>520?24:spd>380?46:70,1-Math.exp(-7*dt));
-        const tm=p.turbo>0?1.5:1,tv=ax>.2?Math.max(400*tm,p.vx*.995):ax<-.2?Math.min(-190,p.vx*.995):(Math.abs(p.vx)>250?p.vx*.995:p.face*250);p.vx=lerp(p.vx,tv,1-Math.exp(-2.6*dt));
+        const spd=Math.abs(p.vx);p.vy=lerp(p.vy,(spd>520?24:spd>380?46:70)*(1-.14*UP.leaf),1-Math.exp(-7*dt));
+        const tm=(p.turbo>0?1.5:1)*(1+.06*UP.leaf),tv=ax>.2?Math.max(400*tm,p.vx*.995):ax<-.2?Math.min(-190,p.vx*.995):(Math.abs(p.vx)>250?p.vx*.995:p.face*250);p.vx=lerp(p.vx,tv,1-Math.exp(-2.6*dt));
         if(Math.random()<.5)parts.push({x:p.x-p.face*12,y:p.y-34,vx:-p.face*40,vy:10,l:.5,m:.5,c:'#ffffffaa',g:0,r:2})
       }else{
         if(p.vy>=0)p.cut=false;const g=((p.vy<0&&!jh&&p.cut)?2700:1500)*(p.float>0?.5:1);p.vy=Math.min(p.vy+g*dt,1100);
@@ -457,7 +473,7 @@ function update(dt){
   /* ninja ledge hang: touch a wall just under its lip while pushing into it and you grab on */
   if(!p.hang&&p.wallS&&!p.ground&&p.grabCd<=0&&p.dashT<=0&&!(p.hook&&p.hook.mode==='on')&&ax*p.wall>.2){
     const s=p.wallS,dy=p.y-s.y;
-    if(dy>16&&dy<74&&p.vy>-150&&!s.gone){p.hang=s;p.hangSide=p.wall;p.y=s.y+46;p.vx=0;p.vy=0;p.jumps=2;p.dashes=1;p.leafKick=0;p.cut=false;p.kickT=0;sfx.land();burst(p.x+p.wall*6,s.y+4,6,'#e8dccb',90,.3,200);toast('Hanging on! Jump to climb, push away + jump to kick off','#ffe9b0')}}
+    if(dy>16&&dy<74&&p.vy>-150&&!s.gone){p.hang=s;p.hangSide=p.wall;p.y=s.y+46;p.vx=0;p.vy=0;p.jumps=2;p.dashes=maxDash();p.leafKick=0;p.cut=false;p.kickT=0;sfx.land();burst(p.x+p.wall*6,s.y+4,6,'#e8dccb',90,.3,200);toast('Hanging on! Jump to climb, push away + jump to kick off','#ffe9b0')}}
   if(p.hang){const s=p.hang;
     if(s.gone||p.ground){p.hang=null}
     else{p.y=s.y+46;p.x=p.hangSide>0?s.x-8:s.x+s.w+8;p.vx=0;p.vy=0;if(ay>.6){p.hang=null;p.grabCd=.35}else if(ax*p.hangSide<-.5&&!jh){p.hang=null;p.grabCd=.3;p.vx=-p.hangSide*120}}}
@@ -467,12 +483,12 @@ function update(dt){
   if(p.turbo>0&&Math.random()<.7)parts.push({x:p.x-p.face*10,y:p.y-18+Math.random()*10,vx:-p.face*80,vy:0,l:.3,m:.3,c:'#ffd84a',g:0,r:2.4});
   for(const b of boosts){if(b.got)continue;
     if(b.k==='pad'){if(Math.abs(b.x-p.x)<38&&Math.abs(p.y-b.y)<26&&p.vy>=-50){p.turbo=Math.max(p.turbo,1.4);if(p.ground){const d=Math.abs(p.vx)>20?Math.sign(p.vx):p.face;p.vx=d*Math.max(Math.abs(p.vx),640)}if(time>(b.cd||0)){b.cd=time+.6;sfx.dash();burst(b.x,b.y,8,'#ffd84a',160,.3,0)}}}
-    else if(b.k==='spring'){b.sq=Math.max(0,(b.sq||0)-dt);if(Math.abs(b.x-p.x)<30&&p.y>b.y-22&&p.y<b.y+14&&p.vy>=0&&time>(b.cd||0)){b.cd=time+.35;b.sq=.35;p.vy=-1040;p.ground=false;p.hang=null;p.cut=false;p.jumps=2;p.dashes=1;p.rollT=0;sfx.air();burst(b.x,b.y,10,'#ffb3e6',200,.4,300)}}
+    else if(b.k==='spring'){b.sq=Math.max(0,(b.sq||0)-dt);if(Math.abs(b.x-p.x)<30&&p.y>b.y-22&&p.y<b.y+14&&p.vy>=0&&time>(b.cd||0)){b.cd=time+.35;b.sq=.35;p.vy=-1040;p.ground=false;p.hang=null;p.cut=false;p.jumps=2;p.dashes=maxDash();p.rollT=0;sfx.air();burst(b.x,b.y,10,'#ffb3e6',200,.4,300)}}
     else if(Math.hypot(b.x-p.x,b.y-(p.y-24))<38){b.got=true;const i=BOOST[b.k];sfx.gem();burst(b.x,b.y,14,i.c,220,.5,60);toast(i.n+'!',i.c);
-      if(b.k==='turbo')p.turbo=3;
-      else if(b.k==='lift'){p.hook=null;p.hang=null;p.vy=-980;p.ground=false;p.jumps=2;p.dashes=1;p.cut=false}
+      if(b.k==='turbo')p.turbo=3*bm();
+      else if(b.k==='lift'){p.hook=null;p.hang=null;p.vy=-980;p.ground=false;p.jumps=2;p.dashes=maxDash();p.cut=false}
       else if(b.k==='shield')p.shield=true;
-      else if(b.k==='freeze')cat.freeze=3.4}}
+      else if(b.k==='freeze')cat.freeze=3.4*bm()}}
   /* crumbling ledges fall a moment after you stop on them, then come back */
   if(P.on!==P.lastOn){if(P.lastOn)P.lastOn.ct=0;P.lastOn=P.on}
   if(P.on&&P.on.crumble&&!P.on.gone&&P.ground){P.on.ct=(P.on.ct||0)+dt;if(P.on.ct>.6){const s=P.on;s.gone=true;s.back=time+2.6;burst(s.x+s.w/2,s.y+10,16,map.rock[0],170,.6,500);sfx.land()}}
@@ -494,7 +510,7 @@ function update(dt){
       else{const q=opos(o);if(q[2]||Math.abs(q[0]-p.x)>80)continue;const qx=clamp(q[0],p.x-8,p.x+8),qy=clamp(q[1],top,p.y);hit=Math.hypot(q[0]-qx,q[1]-qy)<(o.k==='hawk'?20:18)}
       if(hit){hurt(o);break}}}
   /* shards */
-  for(const s of shards){if(!s.got&&Math.abs(s.x-p.x)<32&&Math.abs(s.y-(p.y-22))<34){s.got=true;shards_got++;sfx.gem();burst(s.x,s.y,10,'#ffe27a',200,.5,0)}}
+  const mg=22*UP.magnet;for(const s of shards){if(!s.got&&Math.abs(s.x-p.x)<32+mg&&Math.abs(s.y-(p.y-22))<34+mg){s.got=true;shards_got++;bank++;saveBank();sfx.gem();burst(s.x,s.y,10,'#ffe27a',200,.5,0)}}
   /* cat */
   cat.t+=dt;const gap=p.x-cat.x;
   cat.speed=map.cat*1.07+Math.min(levelT*1.6,90);
@@ -970,7 +986,7 @@ function draw(){
   for(const tr of P.trail){ctx.globalAlpha=tr.a*.6;drawMouse({x:tr.x,y:tr.y,vx:0,face:tr.f,ground:false,anim:0,dash:true},'#7fe9ff',tr.a*.6);ctx.globalAlpha=1}
   if(state!=='menu'){drawCat(t);if(cat.freeze>0){ctx.fillStyle='rgba(170,232,255,.5)';ctx.beginPath();ctx.ellipse(cat.x-50,cat.y-45,92,52,0,0,6.283);ctx.fill();ctx.strokeStyle='#e8fbff';ctx.lineWidth=2;ctx.stroke()}}
   if(state!=='menu'||true){const blink=P.inv>0&&((t*12)|0)%2;
-    const head=drawMouse({x:P.x,y:P.y,vx:P.vx,vy:P.vy,face:P.face,ground:P.ground,gliding:P.gliding,leaf:P.leaf,cling:P.cling&&!P.ground,hang:!!P.hang,ws:P.hang?P.hangSide:P.wall,kick:P.kickT>0,hook:h&&h.mode==='on'?[h.tx,h.ty]:null,anim:P.anim,dash:P.dashT>0,roll:P.rollT>0,ra:P.kickT>0?-P.flip*P.face:time*16*P.face},null,blink?.45:1);
+    const head=drawMouse({x:P.x,y:P.y,vx:P.vx,vy:P.vy,face:P.face,ground:P.ground,gliding:P.gliding,leaf:P.leaf,cling:P.cling&&!P.ground,hang:!!P.hang,ws:P.hang?P.hangSide:P.wall,kick:P.kickT>0||P.tumT>0,hook:h&&h.mode==='on'?[h.tx,h.ty]:null,anim:P.anim,dash:P.dashT>0,roll:P.rollT>0,ra:(P.kickT>0||P.tumT>0)?-P.flip*P.face:time*16*P.face},null,blink?.45:1);
     drawScarf(head[0],head[1],P.face)
     if(state!=='menu'&&P.shield){ctx.strokeStyle='rgba(154,184,255,'+(.55+.25*Math.sin(t*6))+')';ctx.fillStyle='rgba(154,184,255,.16)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(P.x,P.y-28,40,0,6.283);ctx.fill();ctx.stroke()}
     if(P.turbo>0){ctx.strokeStyle='rgba(255,216,74,.55)';ctx.lineWidth=2;for(let i=0;i<3;i++){const y=P.y-10-i*12;ctx.beginPath();ctx.moveTo(P.x-P.face*14,y);ctx.lineTo(P.x-P.face*(40+i*10+Math.random()*8),y);ctx.stroke()}}}
@@ -1044,7 +1060,15 @@ const KEYS=`<ul class="keys">
 function showMenu(){
   state='menu';ov.hidden=false;
   ov.innerHTML=`<div class="card"><div class="lead"><h1>Ninja<br><em>Mouse</em></h1><p class="tag">The cat is coming. Grapple, double jump, dash and glide across mountains and waterfalls to reach the safe hole.</p>
-  <p class="stat">Pick a journey</p>${mapsHTML(pickMap)}<div class="row"><button class="btn" data-act="play">Run</button><button class="btn ghost" data-act="mp">Multiplayer</button></div></div>${KEYS}</div>`;
+  <p class="stat">Pick a journey</p>${mapsHTML(pickMap)}<div class="row"><button class="btn" data-act="play">Run</button><button class="btn ghost" data-act="mp">Multiplayer</button><button class="btn ghost" data-act="shop">Upgrades · ${bank} cheese</button></div></div>${KEYS}</div>`;
+}
+function showShop(msg){
+  state='menu';ov.hidden=false;
+  ov.innerHTML=`<div class="card shopc"><div class="lead"><div><p class="stat">Cheese shop</p><h1 style="margin:0">Ninja <em>Upgrades</em></h1><p class="tag" style="margin:4px 0 0">You have <b>${bank}</b> cheese. Spend it on skills that stay with you. ${msg||''}</p></div>
+  <div class="row"><button class="btn" data-act="menu">Back</button></div></div>
+  <div class="shop">${Object.keys(UPG).map(k=>{const u=UPG[k],lv=UP[k],maxed=lv>=u.max,cost=maxed?0:u.cost[lv];
+    return`<div class="up"><b>${u.n}</b> <span class="pips">${'●'.repeat(lv)}${'○'.repeat(u.max-lv)}</span><p>${maxed?'Maxed out! '+u.d[u.max-1]:u.d[lv]}</p>
+    <button class="btn ${bank>=cost&&!maxed?'':'ghost'}" data-act="buy" data-k="${k}" ${maxed||bank<cost?'disabled':''}>${maxed?'Maxed':'Buy · '+cost+' cheese'}</button></div>`}).join('')}</div></div>`;
 }
 function showPause(){ov.hidden=false;ov.innerHTML=`<div class="card solo"><div class="lead"><p class="stat">Paused · ${map.name}</p><h1>Catch your<br><em>breath</em></h1>
   <div class="row"><button class="btn" data-act="resume">Resume</button>${NET.active?'<button class="btn ghost" data-act="leave">Leave room</button>':'<button class="btn ghost" data-act="restart">Restart</button><button class="btn ghost" data-act="menu">Menu</button>'}</div></div></div>`}
@@ -1052,7 +1076,7 @@ function showOver(){
   ov.hidden=false;const nxt=MAPS[(mapIdx+1)%MAPS.length];
   if(ended==='caught')ov.innerHTML=`<div class="card solo"><div class="lead"><p class="stat">${map.name} · ${Math.round(P.x/10)}m · ${shards_got} cheese</p><p class="big">Caught!</p>
     <p class="tag">The cat got you. Your next journey is ${nxt.name}: ${nxt.blurb.toLowerCase()}</p><div class="row"><button class="btn" data-act="next">Run ${nxt.name}</button><button class="btn ghost" data-act="retry">Retry ${map.name}</button><button class="btn ghost" data-act="menu">Menu</button></div></div></div>`;
-  else ov.innerHTML=`<div class="card solo"><div class="lead"><p class="stat">${map.name} · ${levelT.toFixed(1)}s · ${shards_got} cheese</p><p class="big">Safe!</p>
+  else ov.innerHTML=`<div class="card solo"><div class="lead"><p class="stat">${map.name} · ${levelT.toFixed(1)}s · ${shards_got} cheese (+8 bonus)</p><p class="big">Safe!</p>
     <p class="tag">You made it to the safe hole. Best time here: ${best[mapIdx].time}s.</p><div class="row"><button class="btn" data-act="next">Run ${nxt.name}</button><button class="btn ghost" data-act="menu">Menu</button></div></div></div>`;
 }
 function play(i,seed){audio();startMap(i,seed);ov.hidden=true;ov.innerHTML='';state='play';countdown=0;if(map.tip)toast(map.tip,'#ffd58a')}
@@ -1061,6 +1085,8 @@ isPlaying=()=>state==='play';
 ov.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audio();const a=b.dataset.act;
   if(a==='map'){pickMap=+b.dataset.i;ov.querySelectorAll('[data-act="map"]').forEach(x=>x.setAttribute('aria-pressed',x===b));if(NET.active&&NET.isHost){NET.lobby.map=pickMap;broadcastLobby()}return}
+  if(a==='shop')return showShop();
+  if(a==='buy'){const k=b.dataset.k,u=UPG[k],lv=UP[k];if(u&&lv<u.max&&bank>=u.cost[lv]){bank-=u.cost[lv];UP[k]++;saveBank();sfx.gem&&sfx.gem()}return showShop(u?'Upgraded '+u.n+'!':'')}
   if(a==='play')return play(pickMap);
   if(a==='resume'){ov.hidden=true;state='play';return}
   if(a==='restart'||a==='retry')return play(mapIdx);
