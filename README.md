@@ -49,7 +49,7 @@ Every cheese you grab goes into a bank that is saved on your phone (plus 8 bonus
 - **Strong Grip** (longer reach, faster reel), **Big Leaf** (slower sink, faster glide), **Quick Dash** (faster recharge, then two dashes)
 - **Cheese Magnet**, **Ninja Kick** (stronger wall and ledge kick-offs), **Lucky Start** (begin with a shield) and **Boost Master** (longer boosts)
 
-The grapple is gentle at the start: it reels you in and lets go with a small pop. Strong Grip upgrades add reach and pull. Every menu page scales to fit your screen, with no scrolling.
+The grapple has its original strong pull. Strong Grip upgrades add a little more reach and pull. Every menu page scales to fit your screen, with no scrolling.
 
 ## Difficulty
 Ledges are about 50% wider so there is room to run, and ground hazards are rare (at most one per ledge, none at the very start). The challenge comes from longer gaps, bigger height changes, wind, crumbling clouds and a faster cat instead.

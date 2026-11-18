@@ -285,7 +285,7 @@ let boosts=[];
 const BOOST={turbo:{c:'#ffd84a',n:'TURBO'},lift:{c:'#8fe8ff',n:'LIFT'},shield:{c:'#9ab8ff',n:'SHIELD'},freeze:{c:'#c8f4ff',n:'FREEZE'}};
 const cat={x:-260,y:480,speed:200,t:0,roarT:0};
 let state='menu',cam={x:0,y:0},time=0,levelT=0,shards_got=0,parts=[],shake=0,hintT=0,winX=0,ended=null;
-let RANGE=520;const maxDash=()=>UP.dash>=3?2:1,bm=()=>1+.3*UP.boost;
+let RANGE=600;const maxDash=()=>UP.dash>=3?2:1,bm=()=>1+.3*UP.boost;
 
 function startMap(i,seed){
   mapIdx=((i%MAPS.length)+MAPS.length)%MAPS.length;map=MAPS[mapIdx];
@@ -293,7 +293,7 @@ function startMap(i,seed){
   addChunk(-300,480,820,map.ground);genX=520;lastTop=480;genUntil(2600);
   Object.assign(P,{x:140,y:480,vx:0,vy:0,face:1,ground:true,coyote:0,jumps:2,dashes:1,dashT:0,dashCd:0,rollT:0,rollCd:0,gliding:false,hook:null,wall:0,inv:1,safe:{x:140,y:480},trail:[],land:0,leaf:0,turbo:0,shield:false,hang:null,cling:false,kickT:0,grabCd:0,wallS:null,flip:0});
   Object.assign(cat,{x:-300,y:480,speed:map.cat,t:0,roarT:3,freeze:0,mode:'run',vy:0,ph:0,boost:0,lvx:0});
-  RANGE=520+80*UP.grip;P.shield=UP.start>0;P.triUsed=false;P.tumT=0;
+  RANGE=600+70*UP.grip;P.shield=UP.start>0;P.triUsed=false;P.tumT=0;
   parts=[];shake=0;flashAt=-9;nextFlash=2;levelT=0;shards_got=0;hintT=7;time=0;ended=null;winX=0;
   cam.x=P.x-W/S*.3;cam.y=P.y-300;clearInput();
 }
@@ -332,7 +332,7 @@ function updateHook(dt,ax,ay){
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
     const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=4400*dt;
     if(dd<=st){h.mode='on';const L=Math.hypot(h.tx-hx,h.ty-hy)||1;h.len=clamp(L,40,RANGE);h.minT=time+.32;P.dashes=maxDash();P.ground=false;
-      P.vx+=(h.tx-hx)/L*150;P.vy+=(h.ty-hy)/L*150;   // a tug the moment it bites
+      P.vx+=(h.tx-hx)/L*400;P.vy+=(h.ty-hy)/L*400;   // a tug the moment it bites
       sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
     else{h.tipx+=dx/dd*st;h.tipy+=dy/dd*st}
     return;
@@ -343,7 +343,7 @@ function updateHook(dt,ax,ay){
   h.pull=!(ay>.4);
   if(h.pull){
     /* reel in: the rope hauls you toward what you hooked, up into the sky or onto the rock, and keeps your sideways speed so you curve */
-    const gr=1+.16*UP.grip;P.vx+=ux*2300*gr*dt;P.vy+=uy*2300*gr*dt;P.vy+=700*dt;
+    const gr=1+.1*UP.grip;P.vx+=ux*5400*gr*dt;P.vy+=uy*5400*gr*dt;P.vy+=700*dt;
     h.len=Math.max(30,Math.min(h.len,d+1));
     if(ax){const push=ax*900*dt;P.vx+=tx*push;P.vy+=ty*push}
     if(d<58){zipOff(h,ux,uy);return}
@@ -353,13 +353,13 @@ function updateHook(dt,ax,ay){
     if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
   }
   P.vx*=1-.04*dt;P.vy*=1-.04*dt;
-  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?760*(1+.08*UP.grip):900;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
+  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?1600*(1+.05*UP.grip):1150;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
 }
 /* reaching the hook: let go and keep flying with all your speed, plus a pop so you clear the ledge or rise past the lantern */
 function zipOff(h,ux,uy){
   P.hook=null;P.jumps=Math.max(P.jumps,1);P.dashes=maxDash();P.cut=false;P.float=.5;
-  const sp=Math.hypot(P.vx,P.vy);if(sp<300){const k=300/(sp||1);P.vx*=k;P.vy*=k}else if(sp>600){const k=600/sp;P.vx*=k;P.vy*=k}
-  P.vy=Math.min(P.vy,0)-(uy<-.3?110:60);
+  const sp=Math.hypot(P.vx,P.vy);if(sp<680){const k=680/(sp||1);P.vx*=k;P.vy*=k}
+  P.vy=Math.min(P.vy,0)-(uy<-.3?300:180);
   sfx.air();burst(h.tx,h.ty,10,'#fff2c4',200,.4,150);
 }
 /* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
