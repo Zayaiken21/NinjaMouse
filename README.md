@@ -43,6 +43,9 @@ Each run is built fresh from a seed: rock pillars, waterfalls pouring into the r
 
 The cat is fully rigged: it gallops, leaps the gaps in an arc and scrambles up cliff faces. If you get hit or splash into the river it surges forward, so protect yourself.
 
+## Turning your phone
+Play in either landscape direction. The game re-measures the screen every time you rotate, keeps buttons clear of the notch and home bar on whichever side they are, releases any held touches, and pauses if you tip back to portrait.
+
 ## Cheese upgrades
 Every cheese you grab goes into a bank that is saved on your phone (plus 8 bonus cheese for reaching the safe hole). Open **Upgrades** on the menu to spend it:
 - **Backflip** (double jump becomes a spinning flip, higher) and **Sky flip** (one more flip jump in the air)
