@@ -1136,7 +1136,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='p
 let lastT=performance.now(),slow=.016,slowN=0;
 let frameN=0;
 function frame(now){
-  if((frameN++&15)===0&&(Math.abs(cv.clientWidth-W)>1||Math.abs(cv.clientHeight-H)>1))resize();
+  if((frameN++&3)===0&&(Math.abs(cv.clientWidth-W)>1||Math.abs(cv.clientHeight-H)>1||cv.width!==Math.round(W*DPR)||cv.height!==Math.round(H*DPR)))resize();
   const dt=Math.min(.05,(now-lastT)/1000)||0;lastT=now;
   /* keep it smooth: if frames stay slow, draw at a lower resolution (2 -> 1.5 -> 1). It never goes back up, so it can't flip-flop */
   if(state==='play'&&dt>0){slow=slow*.97+dt*.03;if(++slowN>150&&slow>.0235&&DPRMAX>1){DPRMAX=DPRMAX>1.5?1.5:1;slowN=0;slow=.016;resize()}}

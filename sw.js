@@ -1,6 +1,6 @@
 // Ninja Mouse service worker: saves the game on the phone so solo runs work with no service, and makes it installable.
 // Bump CACHE when you change the game so phones pick up the new version.
-const CACHE = 'ninja-mouse-v10';
+const CACHE = 'ninja-mouse-v11';
 const CORE = ['./', './index.html', './join.html', './manifest.webmanifest', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/favicon-32.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
