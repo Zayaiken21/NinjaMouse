@@ -26,6 +26,7 @@ When you change the game, bump `CACHE` in `sw.js` (for example `ninja-mouse-v2`)
 - **Neon Rooftops:** a lit-up city at night with neon signs and steam vents
 - **Cloud Kingdom:** walk on puffy clouds in a pastel sunset sky, with winds and lots of boosts
 - **Sunset Clouds, Moonlit Cloud Sea and Thunder Clouds:** more cloud floors, from a golden sunset to a lightning storm that is the hardest journey
+- **Autumn Gorge, Aurora Tundra, Candy Canyon, Haunted Hollow and Lantern Night:** red maples, northern lights, sugar cliffs, a spooky forest and a festival of floating lanterns
 - **Crystal Caverns:** glowing crystal caves with stalactites, crumbling ledges and an underground river
 
 Each run is built fresh from a seed: rock pillars, waterfalls pouring into the river, floating ledges, clouds with hanging gold rings and glowing lantern balloons to grapple from, and cheese to collect. Reach the safe hole at the end before the cat catches you.
@@ -48,7 +49,7 @@ Every cheese you grab goes into a bank that is saved on your phone (plus 8 bonus
 - **Strong Grip** (longer reach, faster reel), **Big Leaf** (slower sink, faster glide), **Quick Dash** (faster recharge, then two dashes)
 - **Cheese Magnet**, **Ninja Kick** (stronger wall and ledge kick-offs), **Lucky Start** (begin with a shield) and **Boost Master** (longer boosts)
 
-The grapple pull is gentler and more realistic now: it reels you in and lets go with a modest pop instead of flinging you across the map.
+The grapple is gentle at the start: it reels you in and lets go with a small pop. Strong Grip upgrades add reach and pull. Every menu page scales to fit your screen, with no scrolling.
 
 ## Difficulty
 Ledges are about 50% wider so there is room to run, and ground hazards are rare (at most one per ledge, none at the very start). The challenge comes from longer gaps, bigger height changes, wind, crumbling clouds and a faster cat instead.

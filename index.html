@@ -21,7 +21,7 @@
 /* Layout: one full-bleed landscape canvas; DOM overlays for menus. Single dusk-sky look that shifts by biome. */
 :root{--bg:#140c2e;--fg:#f4f1ff;--mut:#b9b0e0;--acc:#ff8a5c;--cy:#7fe9ff;--panel:rgba(20,12,46,.74);--line:rgba(244,241,255,.16);color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);overflow:hidden;font-family:Sora,system-ui,-apple-system,"Segoe UI",sans-serif}
-#stage{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+#stage{position:relative;width:100%;height:100%;height:100dvh;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #c{display:block;width:100%;height:100%;touch-action:none}
 .ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;background:radial-gradient(ellipse at 30% 40%,rgba(40,20,80,.45),rgba(14,8,32,.92))}
 .ov[hidden]{display:none!important}
@@ -42,8 +42,13 @@ h1 em{color:var(--acc);font-style:inherit}
 .keys li{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:baseline;padding:clamp(6px,2vh,10px) 12px;background:var(--panel);border-radius:10px;font-size:clamp(11px,3.1vh,14px);line-height:1.35;color:var(--mut)}
 .keys b{font:700 clamp(11px,3vh,13px) "Chakra Petch",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--fg)}
 .card.shopc{max-width:900px;flex-direction:column;align-items:stretch;gap:8px;margin:auto}.shopc .lead{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;flex:none}.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:10px}.up{background:rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:6px}.up p{margin:0;font-size:12.5px;opacity:.85;flex:1}.up .btn{padding:8px 12px;font-size:13px}.pips{color:var(--acc);letter-spacing:2px;font-size:12px}
-.maps{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;margin:2px 0 4px;padding:3px 2px 6px;scrollbar-width:thin}
-.mp{appearance:none;cursor:pointer;border:0;border-radius:10px;padding:8px 12px;background:var(--panel);color:var(--mut);text-align:left;font:500 clamp(11px,3vh,13px)/1.25 Sora,system-ui,sans-serif;box-shadow:inset 0 0 0 2px var(--line);min-width:0;flex:0 0 clamp(124px,23vw,158px);scroll-snap-align:start;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.65)}
+.card.menu{max-width:860px;align-items:stretch}.card.menu .lead{flex:0 0 38%}.pickc{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center}.pick{display:flex;flex-direction:column;gap:8px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btns .btn{padding:11px 10px;font-size:clamp(12px,3.2vh,15px);white-space:nowrap}
+.maps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.pager{display:flex;align-items:center;justify-content:center;gap:14px;font:700 13px "Chakra Petch",system-ui,sans-serif;color:var(--mut)}.pager .btn.sm{padding:5px 16px;font-size:18px;line-height:1}
+.blurb{max-width:none;min-height:2.9em}.blurb b{color:var(--fg)}
+.card.how{max-width:900px;flex-direction:column;align-items:stretch;gap:10px;margin:auto}.how .lead{flex-direction:row;align-items:center;justify-content:space-between}.how .keys{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mp{appearance:none;cursor:pointer;border:0;border-radius:10px;padding:8px 12px;background:var(--panel);color:var(--mut);text-align:left;font:500 clamp(11px,3vh,13px)/1.25 Sora,system-ui,sans-serif;box-shadow:inset 0 0 0 2px var(--line);min-width:0;min-height:clamp(46px,13vh,64px);display:flex;flex-direction:column;justify-content:center;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.65)}
 .mp b{display:block;font:700 clamp(12px,3.3vh,15px) "Chakra Petch",system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#fff}
 .mp[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--acc),0 0 14px rgba(255,138,92,.5);color:#fff}
 .mp:focus-visible{outline:3px solid var(--cy);outline-offset:2px}
@@ -64,7 +69,7 @@ h1 em{color:var(--acc);font-style:inherit}
 .plist li small{grid-column:2;display:inline}
 .plist i{width:12px;height:12px;border-radius:50%;grid-row:span 2}
 .empty{margin:0;color:var(--mut);font-size:13px;line-height:1.45}
-.ov{overflow:auto}
+.ov{overflow:auto;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
 #rot{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:var(--bg);text-align:center;padding:24px}
 #rot p{margin:0;font:700 22px "Chakra Petch",system-ui,sans-serif;letter-spacing:.04em}
 #rot small{display:block;margin-top:6px;font:400 14px Sora,system-ui,sans-serif;color:var(--mut)}
@@ -133,7 +138,17 @@ const MAPS=[
 {name:'Moonlit Cloud Sea',blurb:'Silver clouds under a huge moon and a sky full of stars',tip:'Silver clouds crumble if you stand still. Keep moving',finish:25000,cat:250,gap:[130,290],w:[120,250],dy:150,top:[260,500],ground:'rock',fall:0,treeP:.35,hazard:'crumble',wind:.5,tk:'blossom',noPines:true,cloud:true,rays:true,amb:['sparkle',46],boostP:.5,springP:.5,padP:.4,
  sky:['#090e3c','#27308a','#7a6cc8'],sun:'#eef2ff',moon:true,far:['#3a3f8c','#2b2f78','#1d2060'],snow:'#d6dcff',fog:'#5a62b8',rock:['#d9dfff','#6a72c8'],cap:'#f2f5ff',tree:'#8f9dff',tree2:'#d6dcff',water:['#8d9bff','#262c78'],rim:'#e8ecff',flow:15,rain:false},
 {name:'Thunder Clouds',blurb:'A raging storm above the world. Lightning, rain and wild winds',tip:'The hardest journey. Crumbling clouds and fierce wind',finish:26000,cat:272,gap:[140,300],w:[110,230],dy:160,top:[260,500],ground:'rock',fall:0,treeP:.1,hazard:'crumble',wind:.9,storm:true,rain:true,tk:'blossom',noPines:true,cloud:true,boostP:.55,springP:.5,padP:.4,
- sky:['#12162b','#2b3354','#5b6591'],sun:'#9aa8d8',moon:false,far:['#2f3558','#232846','#181c34'],snow:'#9aa8d8',fog:'#3f4770',rock:['#a4acd0','#464e7e'],cap:'#cdd5f2',tree:'#5b6591',tree2:'#8b95c2',water:['#6a76b0','#1c2244'],rim:'#cdd5f2',flow:20}
+ sky:['#12162b','#2b3354','#5b6591'],sun:'#9aa8d8',moon:false,far:['#2f3558','#232846','#181c34'],snow:'#9aa8d8',fog:'#3f4770',rock:['#a4acd0','#464e7e'],cap:'#cdd5f2',tree:'#5b6591',tree2:'#8b95c2',water:['#6a76b0','#1c2244'],rim:'#cdd5f2',flow:20},
+{name:'Autumn Gorge',blurb:'Red and gold maples, falling leaves and a rushing river',tip:'Crisp air and rushing water. Watch the cliff edges',finish:23000,cat:225,gap:[110,250],w:[140,280],dy:130,top:[300,520],ground:'rock',fall:.5,treeP:.9,wind:.3,tk:'blossom',noPines:true,birds:true,rays:true,amb:['petal',36,['rgba(224,90,40,.9)','rgba(245,170,50,.9)']],boostP:.32,
+ sky:['#e8795a','#f7b777','#ffe6b3'],sun:'#fff1c9',moon:false,far:['#c9764f','#a45a40','#7d4332'],snow:'#ffe9c4',fog:'#f4cfa1',rock:['#7d5a46','#47301f'],cap:'#d9813a',tree:'#d4452a',tree2:'#f0a030',water:['#4fb8c9','#1d6a86'],rim:'#fff1d6',flow:70,rain:false},
+{name:'Aurora Tundra',blurb:'Frozen plains under green northern lights',tip:'Ice is slick. Use the glow of the aurora to plan jumps',finish:26000,cat:250,gap:[125,270],w:[110,240],dy:150,top:[270,530],ground:'ice',fall:.3,treeP:.5,wind:.4,amb:['sparkle',34],boostP:.4,
+ sky:['#020818','#07304a','#14786a'],sun:'#dff6ff',moon:true,far:['#2f6a86','#21506a','#143a4f'],snow:'#f2fbff',fog:'#8fd6d0',rock:['#6f9ab8','#34566f'],cap:'#eaffff',tree:'#173f4a',tree2:'#2a6a70',water:['#7fe3ef','#1f7a9a'],rim:'#e0fbff',flow:40,rain:false},
+{name:'Candy Canyon',blurb:'Sugar cliffs, giant lollipop mushrooms and soda geysers',tip:'Soda geysers blast you up. Bounce on the pink springs',finish:23500,cat:230,gap:[110,250],w:[130,260],dy:130,top:[290,520],ground:'rock',fall:.35,treeP:.8,hazard:'geyser',tk:'mush',noPines:true,amb:['sparkle',30],springP:.8,padP:.6,boostP:.45,
+ sky:['#ff9bd2','#ffd2ec','#fff6d6'],sun:'#fffbe0',moon:false,far:['#ffb6dc','#ff96c8','#e676b0'],snow:'#ffffff',fog:'#ffd9ee',rock:['#ff9ec4','#b667b0'],cap:'#8fffd0',tree:'#ff6fb0',tree2:'#7fe6ff',water:['#b6f0ff','#ff8ad0'],rim:'#ffffff',flow:40,rain:false},
+{name:'Haunted Hollow',blurb:'A spooky night forest, ghost lights and creaking ledges',tip:'Ledges creak and crumble. Follow the ghost lights',finish:25000,cat:258,gap:[120,270],w:[110,230],dy:140,top:[280,520],ground:'rock',fall:.15,treeP:.9,hazard:'crumble',tk:'dead',noPines:true,mist:true,amb:['ember',30,['rgba(170,255,200,.8)','rgba(200,170,255,.8)']],boostP:.45,
+ sky:['#0b0716','#241338','#4b2a63'],sun:'#cdbfff',moon:true,far:['#2d1b45','#201233','#150a24'],snow:'#b79cff',fog:'#4a2f6a',rock:['#3a3048','#171220'],cap:'#9be0b0',tree:'#1a1424',tree2:'#3a2a50',water:['#5a4aa0','#1a1244'],rim:'#cdbfff',flow:25,rain:false},
+{name:'Lantern Night',blurb:'A festival night, floating lanterns and a glowing river',tip:'Follow the glowing lanterns across the river',finish:24500,cat:245,gap:[115,260],w:[130,260],dy:130,top:[290,520],ground:'rock',fall:.3,treeP:.7,wind:.3,tk:'blossom',noPines:true,amb:['ember',46,['rgba(255,190,90,.9)','rgba(255,120,80,.9)']],springP:.6,padP:.5,boostP:.45,
+ sky:['#0a0a2e','#1c1a5a','#5a2f7a'],sun:'#ffb05a',moon:true,far:['#2a2a6a','#1e1e55','#141440'],snow:'#ffd27a',fog:'#6a3a8a',rock:['#4a3a6a','#1e1636'],cap:'#ffc861',tree:'#a8325a',tree2:'#ffb05a',water:['#ff9a5a','#5a2a6a'],rim:'#ffe0a0',flow:35,rain:false}
 ];
 
 let best={};try{best=JSON.parse(localStorage.getItem('skyswing-best')||'{}')||{}}catch(_){best={}}
@@ -270,7 +285,7 @@ let boosts=[];
 const BOOST={turbo:{c:'#ffd84a',n:'TURBO'},lift:{c:'#8fe8ff',n:'LIFT'},shield:{c:'#9ab8ff',n:'SHIELD'},freeze:{c:'#c8f4ff',n:'FREEZE'}};
 const cat={x:-260,y:480,speed:200,t:0,roarT:0};
 let state='menu',cam={x:0,y:0},time=0,levelT=0,shards_got=0,parts=[],shake=0,hintT=0,winX=0,ended=null;
-let RANGE=600;const maxDash=()=>UP.dash>=3?2:1,bm=()=>1+.3*UP.boost;
+let RANGE=520;const maxDash=()=>UP.dash>=3?2:1,bm=()=>1+.3*UP.boost;
 
 function startMap(i,seed){
   mapIdx=((i%MAPS.length)+MAPS.length)%MAPS.length;map=MAPS[mapIdx];
@@ -278,7 +293,7 @@ function startMap(i,seed){
   addChunk(-300,480,820,map.ground);genX=520;lastTop=480;genUntil(2600);
   Object.assign(P,{x:140,y:480,vx:0,vy:0,face:1,ground:true,coyote:0,jumps:2,dashes:1,dashT:0,dashCd:0,rollT:0,rollCd:0,gliding:false,hook:null,wall:0,inv:1,safe:{x:140,y:480},trail:[],land:0,leaf:0,turbo:0,shield:false,hang:null,cling:false,kickT:0,grabCd:0,wallS:null,flip:0});
   Object.assign(cat,{x:-300,y:480,speed:map.cat,t:0,roarT:3,freeze:0,mode:'run',vy:0,ph:0,boost:0,lvx:0});
-  RANGE=600+70*UP.grip;P.shield=UP.start>0;P.triUsed=false;P.tumT=0;
+  RANGE=520+80*UP.grip;P.shield=UP.start>0;P.triUsed=false;P.tumT=0;
   parts=[];shake=0;flashAt=-9;nextFlash=2;levelT=0;shards_got=0;hintT=7;time=0;ended=null;winX=0;
   cam.x=P.x-W/S*.3;cam.y=P.y-300;clearInput();
 }
@@ -317,7 +332,7 @@ function updateHook(dt,ax,ay){
     h.tipx=h.tipx==null?hx:h.tipx;h.tipy=h.tipy==null?hy:h.tipy;
     const dx=h.tx-h.tipx,dy=h.ty-h.tipy,dd=Math.hypot(dx,dy),st=4400*dt;
     if(dd<=st){h.mode='on';const L=Math.hypot(h.tx-hx,h.ty-hy)||1;h.len=clamp(L,40,RANGE);h.minT=time+.32;P.dashes=maxDash();P.ground=false;
-      P.vx+=(h.tx-hx)/L*260;P.vy+=(h.ty-hy)/L*260;   // a tug the moment it bites
+      P.vx+=(h.tx-hx)/L*150;P.vy+=(h.ty-hy)/L*150;   // a tug the moment it bites
       sfx.hook();burst(h.tx,h.ty,7,'#fff2c4',160,.35,300)}
     else{h.tipx+=dx/dd*st;h.tipy+=dy/dd*st}
     return;
@@ -328,7 +343,7 @@ function updateHook(dt,ax,ay){
   h.pull=!(ay>.4);
   if(h.pull){
     /* reel in: the rope hauls you toward what you hooked, up into the sky or onto the rock, and keeps your sideways speed so you curve */
-    const gr=1+.12*UP.grip;P.vx+=ux*3600*gr*dt;P.vy+=uy*3600*gr*dt;P.vy+=700*dt;
+    const gr=1+.16*UP.grip;P.vx+=ux*2300*gr*dt;P.vy+=uy*2300*gr*dt;P.vy+=700*dt;
     h.len=Math.max(30,Math.min(h.len,d+1));
     if(ax){const push=ax*900*dt;P.vx+=tx*push;P.vy+=ty*push}
     if(d<58){zipOff(h,ux,uy);return}
@@ -338,13 +353,13 @@ function updateHook(dt,ax,ay){
     if(dy>-20){const push=(ax||P.face*.35)*760*dt;P.vx+=tx*push;P.vy+=ty*push}
   }
   P.vx*=1-.04*dt;P.vy*=1-.04*dt;
-  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?1050*(1+.06*UP.grip):1000;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
+  const sp=Math.hypot(P.vx,P.vy),cap=h.pull?760*(1+.08*UP.grip):900;if(sp>cap){P.vx*=cap/sp;P.vy*=cap/sp}
 }
 /* reaching the hook: let go and keep flying with all your speed, plus a pop so you clear the ledge or rise past the lantern */
 function zipOff(h,ux,uy){
   P.hook=null;P.jumps=Math.max(P.jumps,1);P.dashes=maxDash();P.cut=false;P.float=.5;
-  const sp=Math.hypot(P.vx,P.vy);if(sp<440){const k=440/(sp||1);P.vx*=k;P.vy*=k}else if(sp>800){const k=800/sp;P.vx*=k;P.vy*=k}
-  P.vy=Math.min(P.vy,0)-(uy<-.3?170:90);
+  const sp=Math.hypot(P.vx,P.vy);if(sp<300){const k=300/(sp||1);P.vx*=k;P.vy*=k}else if(sp>600){const k=600/sp;P.vx*=k;P.vy*=k}
+  P.vy=Math.min(P.vy,0)-(uy<-.3?110:60);
   sfx.air();burst(h.tx,h.ty,10,'#fff2c4',200,.4,150);
 }
 /* the rope pulls you back onto its circle after you move, and turns the pull into swing speed instead of losing it */
@@ -924,9 +939,9 @@ function drawAmb(t){
   if(M.mist){for(let i=0;i<4;i++){const x=((hash(i+40)*W*1.6+t*10*(1+i*.3)-cam.x*S*.1)%(W*1.8)+W*1.8)%(W*1.8)-W*.4,y=H*(.62+i*.08),g=ctx.createRadialGradient(x,y,4,x,y,W*.35);g.addColorStop(0,'rgba(160,255,225,.13)');g.addColorStop(1,'rgba(160,255,225,0)');ctx.fillStyle=g;ctx.fillRect(x-W*.35,y-H*.2,W*.7,H*.4)}}
   const a=M.amb;if(!a)return;const n=a[1];ctx.save();
   for(let i=0;i<n;i++){const u=hash(i*2+1),v=hash(i*2+2);
-    if(a[0]==='petal'){const x=((u*W*1.4+t*(34+30*v)-cam.x*S*(.25+.3*v))%(W*1.4)+W*1.4)%(W*1.4)-W*.2,y=((v*H*1.3+t*(26+22*u))%(H*1.3))-H*.15+Math.sin(t*1.5+i)*10;ctx.fillStyle=u>.5?'rgba(255,170,205,.85)':'rgba(255,215,230,.85)';ctx.beginPath();ctx.ellipse(x,y,5,2.6,t*1.5+i,0,6.283);ctx.fill()}
+    if(a[0]==='petal'){const x=((u*W*1.4+t*(34+30*v)-cam.x*S*(.25+.3*v))%(W*1.4)+W*1.4)%(W*1.4)-W*.2,y=((v*H*1.3+t*(26+22*u))%(H*1.3))-H*.15+Math.sin(t*1.5+i)*10;const pc=a[2]||['rgba(255,170,205,.85)','rgba(255,215,230,.85)'];ctx.fillStyle=u>.5?pc[0]:pc[1];ctx.beginPath();ctx.ellipse(x,y,5,2.6,t*1.5+i,0,6.283);ctx.fill()}
     else if(a[0]==='firefly'){const x=((u*W*1.3-cam.x*S*.22+Math.sin(t*.6+i)*40)%(W*1.3)+W*1.3)%(W*1.3)-W*.15,y=H*(.3+.65*v)+Math.cos(t*.8+i*2)*22,p=.35+.65*Math.abs(Math.sin(t*1.3+i*1.7));ctx.fillStyle='rgba(200,255,150,'+(.2*p)+')';ctx.beginPath();ctx.arc(x,y,9,0,6.283);ctx.fill();ctx.fillStyle='rgba(235,255,190,'+p+')';ctx.beginPath();ctx.arc(x,y,2.2,0,6.283);ctx.fill()}
-    else if(a[0]==='ember'){const y=H-((t*(40+70*v)+v*H)%H),x=((u*W*1.3-cam.x*S*.2+Math.sin(t*1.3+i)*24)%(W*1.3)+W*1.3)%(W*1.3)-W*.15;ctx.fillStyle=u>.5?'rgba(255,150,60,.85)':'rgba(255,220,120,.85)';ctx.globalAlpha=clamp(y/H*1.3,0,1);ctx.fillRect(x,y,2.6,2.6);ctx.globalAlpha=1}
+    else if(a[0]==='ember'){const y=H-((t*(40+70*v)+v*H)%H),x=((u*W*1.3-cam.x*S*.2+Math.sin(t*1.3+i)*24)%(W*1.3)+W*1.3)%(W*1.3)-W*.15;const pc=a[2]||['rgba(255,150,60,.85)','rgba(255,220,120,.85)'];ctx.fillStyle=u>.5?pc[0]:pc[1];ctx.globalAlpha=clamp(y/H*1.3,0,1);ctx.fillRect(x,y,2.6,2.6);ctx.globalAlpha=1}
     else{const x=((u*W*1.3-cam.x*S*.15)%(W*1.3)+W*1.3)%(W*1.3)-W*.15,y=H*(.1+.8*v),p=Math.abs(Math.sin(t*2+i*3));if(p>.7){ctx.strokeStyle='rgba(255,255,255,'+(p-.5)+')';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke()}}}
   ctx.restore();
 }
@@ -958,6 +973,7 @@ function crystalTree(tr,t){
 /* ---------- frame ---------- */
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 let countdown=0,toasts=[],curSeed=0;
+function fitText(txt,x,y,stroke){const tw=ctx.measureText(txt).width,mx=W-24,k=tw>mx?mx/tw:1;if(k<1){ctx.save();ctx.translate(x,y);ctx.scale(k,k);stroke?ctx.strokeText(txt,0,0):ctx.fillText(txt,0,0);ctx.restore()}else stroke?ctx.strokeText(txt,x,y):ctx.fillText(txt,x,y)}
 function toast(txt,col){const same=toasts.find(q=>q.txt===txt);if(same){same.t=3;return}toasts.push({txt,col:col||'#fff',t:3});if(toasts.length>3)toasts.shift()}
 const ghosts=new Map();
 function draw(){
@@ -1024,12 +1040,12 @@ function drawHUD(t){
   const gg=geo();ctx.fillStyle='rgba(20,12,46,.55)';ctx.beginPath();ctx.arc(gg.pause.x,gg.pause.y,18,0,6.283);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(gg.pause.x-6,gg.pause.y-7,4,14);ctx.fillRect(gg.pause.x+2,gg.pause.y-7,4,14);
   /* toasts */
   toasts=toasts.filter(q=>(q.t-=1/60)>0);ctx.textAlign='center';ctx.font=`600 13px Sora,system-ui,sans-serif`;
-  ctx.lineJoin='round';toasts.forEach((q,i)=>{ctx.globalAlpha=clamp(q.t,0,1);ctx.lineWidth=4;ctx.strokeStyle='rgba(20,12,46,.85)';ctx.strokeText(q.txt,W/2,by+46+i*18);ctx.fillStyle=q.col;ctx.fillText(q.txt,W/2,by+46+i*18)});ctx.globalAlpha=1;
+  ctx.lineJoin='round';toasts.forEach((q,i)=>{ctx.globalAlpha=clamp(q.t,0,1);ctx.lineWidth=4;ctx.strokeStyle='rgba(20,12,46,.85)';fitText(q.txt,W/2,by+46+i*18,true);ctx.fillStyle=q.col;fitText(q.txt,W/2,by+46+i*18)});ctx.globalAlpha=1;
   /* countdown */
   if(countdown>0){ctx.font=`italic 700 ${Math.round(H*.22)}px ${F}`;ctx.fillStyle='#fff';ctx.fillText(Math.ceil(countdown),W/2,H*.55)}
   else if(levelT<.8&&NET.active){ctx.font=`italic 700 ${Math.round(H*.18)}px ${F}`;ctx.fillStyle='#ffd58a';ctx.fillText('RUN!',W/2,H*.55)}
   if(hintT>0){ctx.globalAlpha=Math.min(1,hintT);ctx.font=`500 ${Math.round(clamp(H*.042,12,16))}px Sora,system-ui,sans-serif`;ctx.fillStyle='#fff';
-    ctx.fillText(coarse?'Tap a cloud ring, lantern or rock to grapple · hold JUMP to glide':'Click to grapple · Space jump (twice to double jump, hold to glide) · Shift dash',W/2,H*.3);ctx.globalAlpha=1}
+    fitText(coarse?'Tap a cloud ring, lantern or rock to grapple · hold JUMP to glide':'Click to grapple · Space jump (twice to double jump, hold to glide) · Shift dash',W/2,H*.3);ctx.globalAlpha=1}
   if(!coarse)return;
   /* touch controls */
   if(stick.on){const R=clamp(H*.16,40,64);ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(stick.ox,stick.oy,R,0,6.283);ctx.stroke();
@@ -1047,7 +1063,10 @@ function drawHUD(t){
 const $=id=>document.getElementById(id);
 const escH=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 let pickMap=0;
-function mapsHTML(sel){return'<div class="maps">'+MAPS.map((m,i)=>`<button class="mp" style="background:linear-gradient(160deg,${m.sky[0]},${m.sky[1]} 60%,${m.far[1]})" data-act="map" data-i="${i}" aria-pressed="${i===sel}"><b>${m.name}</b>${best[i]&&best[i].time?'Best '+best[i].time+'s':m.blurb.split(',')[0]}</button>`).join('')+'</div>'}
+let mapPage=null;const PER=6;
+function mapsHTML(sel){
+  const np=Math.ceil(MAPS.length/PER),pg=mapPage==null?Math.floor(sel/PER):((mapPage%np)+np)%np,cur=MAPS[sel]||MAPS[0];
+  return'<div class="pick"><div class="maps">'+MAPS.slice(pg*PER,pg*PER+PER).map((m,k)=>{const i=pg*PER+k;return`<button class="mp" style="background:linear-gradient(160deg,${m.sky[0]},${m.sky[1]} 60%,${m.far[1]})" data-act="map" data-i="${i}" aria-pressed="${i===sel}"><b>${m.name}</b>${best[i]&&best[i].time?'Best '+best[i].time+'s':''}</button>`}).join('')+`</div><div class="pager"><button class="btn ghost sm" data-act="mpage" data-d="-1" aria-label="Previous maps">‹</button><span>${pg+1} / ${np}</span><button class="btn ghost sm" data-act="mpage" data-d="1" aria-label="More maps">›</button></div><p class="tag blurb"><b>${cur.name}</b> ${cur.blurb}</p></div>`}
 const KEYS=`<ul class="keys">
 <li><b>Move</b><span>${coarse?'Drag your left thumb anywhere on the left side':'A / D or arrow keys'}</span></li>
 <li><b>Jump</b><span>${coarse?'JUMP button':'Space'}. Tap again in the air to double jump, or push off a cliff wall</span></li>
@@ -1058,10 +1077,12 @@ const KEYS=`<ul class="keys">
 <li><b>Boosts</b><span>Glowing orbs: TURBO speed, LIFT sky-launch, SHIELD, FREEZE the cat. Yellow pads add speed, pink mushrooms spring you up</span></li>
 <li><b>Roll</b><span>${coarse?'ROLL button, or flick your left thumb down':'C, Ctrl or ↓'}. Keeps your speed and ducks under logs and low hawks. Press it in the air to roll on landing</span></li></ul>`;
 function showMenu(){
-  state='menu';ov.hidden=false;
-  ov.innerHTML=`<div class="card"><div class="lead"><h1>Ninja<br><em>Mouse</em></h1><p class="tag">The cat is coming. Grapple, double jump, dash and glide across mountains and waterfalls to reach the safe hole.</p>
-  <p class="stat">Pick a journey</p>${mapsHTML(pickMap)}<div class="row"><button class="btn" data-act="play">Run</button><button class="btn ghost" data-act="mp">Multiplayer</button><button class="btn ghost" data-act="shop">Upgrades · ${bank} cheese</button></div></div>${KEYS}</div>`;
+  state='menu';ov.hidden=false;mapPage=null;
+  ov.innerHTML=`<div class="card menu"><div class="lead"><h1>Ninja<br><em>Mouse</em></h1><p class="tag">The cat is coming. Grapple, glide and kick across mountains, clouds and caves to reach the safe hole.</p>
+  <div class="btns"><button class="btn" data-act="play">Run</button><button class="btn ghost" data-act="mp">Multiplayer</button><button class="btn ghost" data-act="shop">Upgrades · ${bank}</button><button class="btn ghost" data-act="how">How to play</button></div></div>
+  <div class="pickc"><p class="stat">Pick a journey</p>${mapsHTML(pickMap)}</div></div>`;
 }
+function showHow(){state='menu';ov.hidden=false;ov.innerHTML=`<div class="card how"><div class="lead"><p class="stat">How to play</p><div class="row"><button class="btn" data-act="menu">Back</button></div></div>${KEYS}</div>`}
 function showShop(msg){
   state='menu';ov.hidden=false;
   ov.innerHTML=`<div class="card shopc"><div class="lead"><div><p class="stat">Cheese shop</p><h1 style="margin:0">Ninja <em>Upgrades</em></h1><p class="tag" style="margin:4px 0 0">You have <b>${bank}</b> cheese. Spend it on skills that stay with you. ${msg||''}</p></div>
@@ -1084,8 +1105,10 @@ onPause=()=>{if(state==='play'&&countdown<=0){state='pause';clearInput();showPau
 isPlaying=()=>state==='play';
 ov.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audio();const a=b.dataset.act;
-  if(a==='map'){pickMap=+b.dataset.i;ov.querySelectorAll('[data-act="map"]').forEach(x=>x.setAttribute('aria-pressed',x===b));if(NET.active&&NET.isHost){NET.lobby.map=pickMap;broadcastLobby()}return}
+  if(a==='map'){pickMap=+b.dataset.i;ov.querySelectorAll('[data-act="map"]').forEach(x=>x.setAttribute('aria-pressed',x===b));const bl=ov.querySelector('.blurb');if(bl)bl.innerHTML='<b>'+MAPS[pickMap].name+'</b> '+MAPS[pickMap].blurb;if(NET.active&&NET.isHost){NET.lobby.map=pickMap;broadcastLobby()}return}
   if(a==='shop')return showShop();
+  if(a==='how')return showHow();
+  if(a==='mpage'){mapPage=(mapPage==null?Math.floor(pickMap/PER):mapPage)+ +b.dataset.d;const pk=ov.querySelector('.pick');if(pk)pk.outerHTML=mapsHTML(NET.active&&NET.lobby?NET.lobby.map|0:pickMap);return}
   if(a==='buy'){const k=b.dataset.k,u=UPG[k],lv=UP[k];if(u&&lv<u.max&&bank>=u.cost[lv]){bank-=u.cost[lv];UP[k]++;saveBank();sfx.gem&&sfx.gem()}return showShop(u?'Upgraded '+u.n+'!':'')}
   if(a==='play')return play(pickMap);
   if(a==='resume'){ov.hidden=true;state='play';return}
@@ -1111,6 +1134,16 @@ function frame(now){
   }catch(err){console.error(err)}
   requestAnimationFrame(frame);
 }
+
+/* every menu page is scaled to fit the screen, so nothing scrolls out of frame */
+function fitOv(){
+  const c=ov.firstElementChild;if(!c||ov.hidden)return;c.style.zoom=1;
+  const cs=getComputedStyle(ov),aw=ov.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),ah=ov.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const r=c.getBoundingClientRect(),z=Math.min(1,aw/Math.max(1,c.scrollWidth),ah/Math.max(1,r.height));c.style.zoom=z<1?Math.max(.5,z*.99):1;
+}
+let fitQ=0;new MutationObserver(()=>{cancelAnimationFrame(fitQ);fitQ=requestAnimationFrame(fitOv)}).observe(ov,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
+addEventListener('resize',()=>requestAnimationFrame(fitOv));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>requestAnimationFrame(fitOv));
 
 /* =========================================================== multiplayer (ported from Riptide Rally)
    One player hosts a room; everyone talks to the host through a free public MQTT relay over secure websockets,
@@ -1449,7 +1482,7 @@ function mpWon(){
 }
 
 resize();startMap(0);showMenu();checkInvite();requestAnimationFrame(frame);
-if(/[?&]debug/.test(location.search))window.__nm={P,get cat(){return cat},get state(){return state},get obst(){return obst},get solids(){return solids},get boosts(){return boosts},get dpr(){return DPR},draw,play:(i)=>play(i,7)};
+if(/[?&]debug/.test(location.search))window.__nm={P,get cat(){return cat},get state(){return state},get obst(){return obst},get solids(){return solids},get boosts(){return boosts},get dpr(){return DPR},draw,play:(i)=>play(i,7),ui:{showMenu,showShop,showHow,showPause,showOver,showMp:s=>showMp(s),setEnd:v=>{ended=v}}};
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(_){}
 })();
 </script>
